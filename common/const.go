@@ -1,5 +1,21 @@
 package common
 
+// KisIdType 用户生成KisId的字符串前缀
+const (
+	KisIdTypeFlow       = "flow"
+	KisIdTypeConnnector = "conn"
+	KisIdTypeFunction   = "func"
+	KisIdTypeGlobal     = "global"
+	KisIdJoinChar       = "-"
+)
+
+const (
+	// FunctionIdFirstVirtual 为首结点Function上一层虚拟的Function ID
+	FunctionIdFirstVirtual = "FunctionIdFirstVirtual"
+	// FunctionIdLastVirtual 为尾结点Function下一层虚拟的Function ID
+	FunctionIdLastVirtual = "FunctionIdLastVirtual"
+)
+
 type KisMode string
 
 const (
