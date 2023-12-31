@@ -22,7 +22,7 @@ type KisFuncOption struct {
 	Params       FParam `yaml:"default_params"`  //选填,在当前Flow中Function定制固定配置参数
 }
 
-// KisFuncConfig 一个NsFunction策略配置
+// KisFuncConfig 一个KisFunction策略配置
 type KisFuncConfig struct {
 	KisType string        `yaml:"kistype"`
 	Fid     string        `yaml:"fid"`

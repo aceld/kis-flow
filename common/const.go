@@ -18,3 +18,13 @@ const (
 	// E 为扩展特征的KisFunction，作为流式计算的自定义特征Function，如，Notify 调度器触发任务的消息发送，删除一些数据，重置状态等。
 	E KisMode = "Expand"
 )
+
+/*
+	是否启动Flow
+*/
+type KisOnOff int
+
+const (
+	FlowEnable  KisOnOff = 1 // 启动
+	FlowDisable KisOnOff = 0 // 不启动
+)

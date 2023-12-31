@@ -6,6 +6,30 @@ import (
 	"testing"
 )
 
+func TestNewFlowConfig(t *testing.T) {
+
+	flowFuncParams1 := flow.KisFlowFunctionParam{
+		Fid: "funcId1",
+		Params: flow.FParam{
+			"flowSetFunParam1": "value1",
+			"flowSetFunParam2": "value2",
+		},
+	}
+
+	flowFuncParams2 := flow.KisFlowFunctionParam{
+		Fid: "funcId2",
+		Params: flow.FParam{
+			"default": "value1",
+		},
+	}
+
+	myFlow1 := flow.NewFlowConfig("flowId", "flowName", 1)
+	myFlow1.AppendFunctionConfig(flowFuncParams1)
+	myFlow1.AppendFunctionConfig(flowFuncParams2)
+
+	fmt.Printf("myFlow1: %+v\n", myFlow1)
+}
+
 func TestNewFuncConfig(t *testing.T) {
 	source := flow.KisSource{
 		Name: "公众号抖音商城户订单数据",
