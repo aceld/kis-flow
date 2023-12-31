@@ -1,4 +1,4 @@
-package flow
+package config
 
 import "kis-flow/common"
 
