@@ -28,3 +28,13 @@ const (
 	FlowEnable  KisOnOff = 1 // 启动
 	FlowDisable KisOnOff = 0 // 不启动
 )
+
+type KisConnType string
+
+const (
+	REDIS KisConnType = "redis"
+	MYSQL KisConnType = "mysql"
+	KAFKA KisConnType = "kafka"
+	TIDB  KisConnType = "tidb"
+	ES    KisConnType = "es"
+)

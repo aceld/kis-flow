@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"kis-flow/common"
 	"kis-flow/flow/kis_config"
 	"testing"
 )
@@ -50,4 +51,38 @@ func TestNewFuncConfig(t *testing.T) {
 	myFunc1 := flow.NewFuncConfig("funcId", "funcName", "Save", &source, &option)
 
 	fmt.Printf("myFunc1: %+v\n", myFunc1)
+}
+
+func TestNewConnConfig(t *testing.T) {
+
+	source := flow.KisSource{
+		Name: "公众号抖音商城户订单数据",
+		Must: []string{"order_id", "user_id"},
+	}
+
+	option := flow.KisFuncOption{
+		Cid:          "connector_id",
+		RetryTimes:   3,
+		RetryDuriton: 300,
+
+		Params: flow.FParam{
+			"param1": "value1",
+			"param2": "value2",
+		},
+	}
+
+	myFunc1 := flow.NewFuncConfig("funcId", "funcName", "Save", &source, &option)
+
+	connParams := flow.FParam{
+		"param1": "value1",
+		"param2": "value2",
+	}
+
+	myConnector1 := flow.NewConnConfig("connectorId", "connectorName", "0.0.0.0:9987,0.0.0.0:9997", common.REDIS, "key", connParams)
+
+	if err := myConnector1.WithFunc(myFunc1); err != nil {
+		fmt.Printf("WithFunc err: %s\n", err.Error())
+	}
+
+	fmt.Printf("myConnector1: %+v\n", myConnector1)
 }

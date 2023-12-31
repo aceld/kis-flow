@@ -137,8 +137,6 @@ params:
 load: null
 save:
   - 测试KisFunction_S1
-flow:
-  - MyFlow1
 ```
 
 #### (4) KisFlow全局配置
