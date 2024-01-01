@@ -1,17 +1,15 @@
-package function
+package kis
 
 import (
 	"context"
-	"kis-flow/common"
 	"kis-flow/config"
-	"kis-flow/flow"
 )
 
-// KisFunction 流式计算基础计算模块，KisFunction是一条流式计算的基本计算逻辑单元，
+// Function 流式计算基础计算模块，KisFunction是一条流式计算的基本计算逻辑单元，
 // 			   任意个KisFunction可以组合成一个KisFlow
-type KisFunction interface {
+type Function interface {
 	// Call 执行流式计算逻辑
-	Call(ctx context.Context, flow *flow.KisFlow) error
+	Call(ctx context.Context, flow Flow) error
 
 	// SetConfig 给当前Function实例配置策略
 	SetConfig(s *config.KisFuncConfig) error
@@ -19,9 +17,9 @@ type KisFunction interface {
 	GetConfig() *config.KisFuncConfig
 
 	// SetFlow 给当前Function实例设置所依赖的Flow实例
-	SetFlow(f *flow.KisFlow) error
+	SetFlow(f Flow) error
 	// GetFlow 获取当前Functioin实力所依赖的Flow
-	GetFlow() *flow.KisFlow
+	GetFlow() Flow
 
 	// SetConnId 如果当前Function为S或者L 那么建议设置当前Funciton所关联的Connector
 	SetConnId(string)
@@ -41,54 +39,11 @@ type KisFunction interface {
 	GetKisId() string
 
 	// Next 返回下一层计算流Function，如果当前层为最后一层，则返回nil
-	Next() KisFunction
+	Next() Function
 	// Prev 返回上一层计算流Function，如果当前层为最后一层，则返回nil
-	Prev() KisFunction
+	Prev() Function
 	// SetN 设置下一层Function实例
-	SetN(f KisFunction)
+	SetN(f Function)
 	// SetP 设置上一层Function实例
-	SetP(f KisFunction)
-}
-
-// NewKisFunction 创建一个NsFunction
-// flow: 当前所属的flow实例
-// s : 当前function的配置策略
-func NewKisFunction(flow *flow.KisFlow, config *config.KisFuncConfig) KisFunction {
-	var f KisFunction
-
-	//工厂生产泛化对象
-	switch common.KisMode(config.Fmode) {
-	case common.V:
-		f = new(KisFunctionV)
-		break
-	case common.S:
-		f = new(KisFunctionS)
-	case common.L:
-		f = new(KisFunctionL)
-	case common.C:
-		f = new(KisFunctionC)
-	case common.E:
-		f = new(KisFunctionE)
-	default:
-		//LOG ERROR
-		return nil
-	}
-
-	//设置基础信息属性
-	if err := f.SetConfig(config); err != nil {
-		panic(err)
-	}
-
-	if err := f.SetFlow(flow); err != nil {
-		panic(err)
-	}
-
-	if config.Option.Cid != "" {
-		f.SetConnId(config.Option.Cid)
-	}
-
-	// 生成随机实力唯一ID
-	f.CreateKisId()
-
-	return f
+	SetP(f Function)
 }

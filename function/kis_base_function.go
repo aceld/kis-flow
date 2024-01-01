@@ -5,18 +5,18 @@ import (
 	"errors"
 	"kis-flow/common"
 	"kis-flow/config"
-	"kis-flow/flow"
 	"kis-flow/id"
+	"kis-flow/kis"
 )
 
 type BaseFunction struct {
 	Config *config.KisFuncConfig
 
-	Flow *flow.KisFlow //上下文环境KisFlow
-	cid  string        //当前Function所依赖的KisConnectorID(如果存在)
+	Flow kis.Flow //上下文环境KisFlow
+	cid  string   //当前Function所依赖的KisConnectorID(如果存在)
 
-	N KisFunction //下一个流计算Function
-	P KisFunction //上一个流计算Function
+	N kis.Function //下一个流计算Function
+	P kis.Function //上一个流计算Function
 
 	//KisId , KisFunction的实例ID，用于KisFlow内部区分不同的实例对象
 	//KisId 和 Function Config中的 Fid的区别在于，Fid用来形容一类Funcion策略的ID，
@@ -26,21 +26,21 @@ type BaseFunction struct {
 
 // Call
 // BaseFunction 为空实现，目的为了让其他具体类型的KisFunction，如KisFunction_V 来继承BaseFuncion来重写此方法
-func (base *BaseFunction) Call(ctx context.Context, flow *flow.KisFlow) error { return nil }
+func (base *BaseFunction) Call(ctx context.Context, flow kis.Flow) error { return nil }
 
-func (base *BaseFunction) Next() KisFunction {
+func (base *BaseFunction) Next() kis.Function {
 	return base.N
 }
 
-func (base *BaseFunction) Prev() KisFunction {
+func (base *BaseFunction) Prev() kis.Function {
 	return base.P
 }
 
-func (base *BaseFunction) SetN(f KisFunction) {
+func (base *BaseFunction) SetN(f kis.Function) {
 	base.N = f
 }
 
-func (base *BaseFunction) SetP(f KisFunction) {
+func (base *BaseFunction) SetP(f kis.Function) {
 	base.P = f
 }
 
@@ -78,7 +78,7 @@ func (base *BaseFunction) GetConfig() *config.KisFuncConfig {
 	return base.Config
 }
 
-func (base *BaseFunction) SetFlow(f *flow.KisFlow) error {
+func (base *BaseFunction) SetFlow(f kis.Flow) error {
 	if f == nil {
 		return errors.New("KisFlow is nil")
 	}
@@ -86,7 +86,7 @@ func (base *BaseFunction) SetFlow(f *flow.KisFlow) error {
 	return nil
 }
 
-func (base *BaseFunction) GetFlow() *flow.KisFlow {
+func (base *BaseFunction) GetFlow() kis.Flow {
 	return base.Flow
 }
 
@@ -104,4 +104,47 @@ func (base *BaseFunction) CreateKisId() {
 
 func (base *BaseFunction) GetKisId() string {
 	return base.KisId
+}
+
+// NewKisFunction 创建一个NsFunction
+// flow: 当前所属的flow实例
+// s : 当前function的配置策略
+func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
+	var f kis.Function
+
+	//工厂生产泛化对象
+	switch common.KisMode(config.Fmode) {
+	case common.V:
+		f = new(KisFunctionV)
+		break
+	case common.S:
+		f = new(KisFunctionS)
+	case common.L:
+		f = new(KisFunctionL)
+	case common.C:
+		f = new(KisFunctionC)
+	case common.E:
+		f = new(KisFunctionE)
+	default:
+		//LOG ERROR
+		return nil
+	}
+
+	//设置基础信息属性
+	if err := f.SetConfig(config); err != nil {
+		panic(err)
+	}
+
+	if err := f.SetFlow(flow); err != nil {
+		panic(err)
+	}
+
+	if config.Option.Cid != "" {
+		f.SetConnId(config.Option.Cid)
+	}
+
+	// 生成随机实力唯一ID
+	f.CreateKisId()
+
+	return f
 }
