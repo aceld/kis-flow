@@ -1,8 +1,8 @@
 package config
 
 import (
-	"fmt"
 	"kis-flow/common"
+	"kis-flow/log"
 )
 
 // FParam 在当前Flow中Function定制固定配置参数类型
@@ -42,7 +42,7 @@ func NewFuncConfig(
 	config.Fname = funcName
 
 	if source == nil {
-		fmt.Printf("funcName NewConfig Error, source is nil, funcName = %s\n", funcId)
+		log.Logger().ErrorF("funcName NewConfig Error, source is nil, funcName = %s\n", funcId)
 		return nil
 	}
 	config.Source = *source
@@ -52,10 +52,10 @@ func NewFuncConfig(
 	//FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
 	if mode == common.S || mode == common.L {
 		if option == nil {
-			fmt.Printf("Funcion S/L need option->Cid\n")
+			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
 			return nil
 		} else if option.Cid == "" {
-			fmt.Printf("Funcion S/L need option->Cid\n")
+			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
 			return nil
 		}
 	}

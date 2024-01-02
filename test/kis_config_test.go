@@ -1,9 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"kis-flow/common"
 	"kis-flow/config"
+	"kis-flow/log"
 	"testing"
 )
 
@@ -28,7 +28,7 @@ func TestNewFlowConfig(t *testing.T) {
 	myFlow1.AppendFunctionConfig(flowFuncParams1)
 	myFlow1.AppendFunctionConfig(flowFuncParams2)
 
-	fmt.Printf("myFlow1: %+v\n", myFlow1)
+	log.Logger().InfoF("myFlow1: %+v\n", myFlow1)
 }
 
 func TestNewFuncConfig(t *testing.T) {
@@ -50,7 +50,7 @@ func TestNewFuncConfig(t *testing.T) {
 
 	myFunc1 := config.NewFuncConfig("funcId", "funcName", "Save", &source, &option)
 
-	fmt.Printf("myFunc1: %+v\n", myFunc1)
+	log.Logger().InfoF("myFunc1: %+v\n", myFunc1)
 }
 
 func TestNewConnConfig(t *testing.T) {
@@ -81,8 +81,8 @@ func TestNewConnConfig(t *testing.T) {
 	myConnector1 := config.NewConnConfig("connectorId", "connectorName", "0.0.0.0:9987,0.0.0.0:9997", common.REDIS, "key", connParams)
 
 	if err := myConnector1.WithFunc(myFunc1); err != nil {
-		fmt.Printf("WithFunc err: %s\n", err.Error())
+		log.Logger().ErrorF("WithFunc err: %s\n", err.Error())
 	}
 
-	fmt.Printf("myConnector1: %+v\n", myConnector1)
+	log.Logger().InfoF("myConnector1: %+v\n", myConnector1)
 }
