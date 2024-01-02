@@ -146,7 +146,7 @@ save:
 kistype: global
 #是否启动prometheus监控
 prometheus_enable: true
-#是否需要nsflow单独启动端口监听
+#是否需要kisflow单独启动端口监听
 prometheus_listen: true
 #prometheus取点监听地址
 prometheus_serve: 0.0.0.0:20004
