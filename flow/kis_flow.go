@@ -14,7 +14,7 @@ import (
 // KisFlow 用于贯穿整条流式计算的上下文环境
 type KisFlow struct {
 	// 基础信息
-	Id   string                // Flow配置策略ID(平台生成管理)
+	Id   string                // Flow的分布式实例ID(用于KisFlow内部区分不同实例)
 	Name string                // Flow的可读名称
 	Conf *config.KisFlowConfig // Flow配置策略
 
@@ -30,24 +30,21 @@ type KisFlow struct {
 	// Function列表参数
 	funcParams map[string]config.FParam // flow在当前Function的自定义固定配置参数,Key:function的实例NsID, value:FParam
 	fplock     sync.RWMutex             // 管理funcParams的读写锁
-
-	KisId string // Flow的分布式实例ID(用于KisFlow内部区分不同实例)
 }
 
 // NewKisFlow 创建一个KisFlow.
 func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 	flow := new(KisFlow)
+	// 实例Id
+	flow.Id = id.KisID(common.KisIdTypeFlow)
 
 	// 基础信息
-	flow.Id = conf.FlowId
 	flow.Name = conf.FlowName
 	flow.Conf = conf
 
 	// Function列表
 	flow.Funcs = make(map[string]kis.Function)
 	flow.funcParams = make(map[string]config.FParam)
-
-	flow.KisId = id.KisID(common.KisIdTypeFlow)
 
 	return flow
 }
@@ -110,7 +107,7 @@ func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) err
 
 	// 将得到的FParams存留在flow结构体中，用来function业务直接通过Hash获取
 	// key 为当前Function的KisId，不用Fid的原因是为了防止一个Flow添加两个相同策略Id的Function
-	flow.funcParams[function.GetKisId()] = params
+	flow.funcParams[function.GetId()] = params
 
 	return nil
 }

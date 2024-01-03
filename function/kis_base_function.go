@@ -10,18 +10,16 @@ import (
 )
 
 type BaseFunction struct {
+	// Id , KisFunction的实例ID，用于KisFlow内部区分不同的实例对象
+	Id     string
 	Config *config.KisFuncConfig
 
+	// flow
 	Flow kis.Flow //上下文环境KisFlow
-	cid  string   //当前Function所依赖的KisConnectorID(如果存在)
 
+	// link
 	N kis.Function //下一个流计算Function
 	P kis.Function //上一个流计算Function
-
-	//KisId , KisFunction的实例ID，用于KisFlow内部区分不同的实例对象
-	//KisId 和 Function Config中的 Fid的区别在于，Fid用来形容一类Funcion策略的ID，
-	//而KisId则为在KisFlow中KisFunction已经实例化的 实例对象ID 这个ID是随机生成且唯一
-	KisId string
 }
 
 // Call
@@ -55,7 +53,7 @@ func (base *BaseFunction) SetConfig(s *config.KisFuncConfig) error {
 }
 
 func (base *BaseFunction) GetId() string {
-	return base.GetConfig().Fid
+	return base.Id
 }
 
 func (base *BaseFunction) GetPrevId() string {
@@ -63,7 +61,7 @@ func (base *BaseFunction) GetPrevId() string {
 		//Function为首结点
 		return common.FunctionIdFirstVirtual
 	}
-	return base.P.GetConfig().Fid
+	return base.P.GetId()
 }
 
 func (base *BaseFunction) GetNextId() string {
@@ -71,7 +69,7 @@ func (base *BaseFunction) GetNextId() string {
 		//Function为尾结点
 		return common.FunctionIdLastVirtual
 	}
-	return base.N.GetConfig().Fid
+	return base.N.GetId()
 }
 
 func (base *BaseFunction) GetConfig() *config.KisFuncConfig {
@@ -90,20 +88,8 @@ func (base *BaseFunction) GetFlow() kis.Flow {
 	return base.Flow
 }
 
-func (base *BaseFunction) GetConnId() string {
-	return base.cid
-}
-
-func (base *BaseFunction) SetConnId(id string) {
-	base.cid = id
-}
-
-func (base *BaseFunction) CreateKisId() {
-	base.KisId = id.KisID(common.KisIdTypeFunction)
-}
-
-func (base *BaseFunction) GetKisId() string {
-	return base.KisId
+func (base *BaseFunction) CreateId() {
+	base.Id = id.KisID(common.KisIdTypeFunction)
 }
 
 // NewKisFunction 创建一个NsFunction
@@ -113,7 +99,7 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	var f kis.Function
 
 	//工厂生产泛化对象
-	switch common.KisMode(config.Fmode) {
+	switch common.KisMode(config.FMode) {
 	case common.V:
 		f = new(KisFunctionV)
 		break
@@ -130,6 +116,9 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 		return nil
 	}
 
+	// 生成随机实例唯一ID
+	f.CreateId()
+
 	//设置基础信息属性
 	if err := f.SetConfig(config); err != nil {
 		panic(err)
@@ -138,13 +127,6 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	if err := f.SetFlow(flow); err != nil {
 		panic(err)
 	}
-
-	if config.Option.Cid != "" {
-		f.SetConnId(config.Option.Cid)
-	}
-
-	// 生成随机实力唯一ID
-	f.CreateKisId()
 
 	return f
 }

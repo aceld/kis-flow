@@ -22,18 +22,18 @@ func TestNewKisFlow(t *testing.T) {
 		Must: []string{"order_id", "user_id"},
 	}
 
-	myFuncConfig1 := config.NewFuncConfig("funcId1", "funcName", common.C, &source1, nil)
+	myFuncConfig1 := config.NewFuncConfig("funcName1", common.C, &source1, nil)
 	if myFuncConfig1 == nil {
 		panic("myFuncConfig1 is nil")
 	}
 
-	myFuncConfig2 := config.NewFuncConfig("funcId2", "funcName", common.V, &source2, nil)
+	myFuncConfig2 := config.NewFuncConfig("funcName2", common.V, &source2, nil)
 	if myFuncConfig2 == nil {
 		panic("myFuncConfig2 is nil")
 	}
 
 	// 2. 创建一个 KisFlow 配置实例
-	myFlowConfig1 := config.NewFlowConfig("flowId", "flowName", common.FlowEnable)
+	myFlowConfig1 := config.NewFlowConfig("flowName1", common.FlowEnable)
 
 	// 3. 创建一个KisFlow对象
 	flow1 := flow.NewKisFlow(myFlowConfig1)

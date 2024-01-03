@@ -21,22 +21,14 @@ type Function interface {
 	// GetFlow 获取当前Functioin实力所依赖的Flow
 	GetFlow() Flow
 
-	// SetConnId 如果当前Function为S或者L 那么建议设置当前Funciton所关联的Connector
-	SetConnId(string)
-	// GetConnId 获取所关联的Connector CID
-	GetConnId() string
-
+	// CreateId 给当前Funciton实力生成一个随机的实例KisID
+	CreateId()
+	// GetId 获取当前Function的FID
+	GetId() string
 	// GetPrevId 获取当前Function上一个Function节点FID
 	GetPrevId() string
 	// GetNextId 获取当前Function下一个Function节点FID
 	GetNextId() string
-	// GetId 获取当前Function的FID
-	GetId() string
-
-	// CreateKisId 给当前Funciton实力生成一个随机的实例KisID
-	CreateKisId()
-	// GetKisId 获取当前Function的唯一实例KisID
-	GetKisId() string
 
 	// Next 返回下一层计算流Function，如果当前层为最后一层，则返回nil
 	Next() Function

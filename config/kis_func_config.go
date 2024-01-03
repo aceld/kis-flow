@@ -16,7 +16,7 @@ type KisSource struct {
 
 // KisFuncOption 可选配置
 type KisFuncOption struct {
-	Cid          string `yaml:"cid"`
+	CName        string `yaml:"cname"`           //连接器Connector名称
 	RetryTimes   int    `yaml:"retry_times"`     //选填,Function调度重试(不包括正常调度)最大次数
 	RetryDuriton int    `yaml:"return_duration"` //选填,Function调度每次重试最大时间间隔(单位:ms)
 	Params       FParam `yaml:"default_params"`  //选填,在当前Flow中Function定制固定配置参数
@@ -25,36 +25,34 @@ type KisFuncOption struct {
 // KisFuncConfig 一个KisFunction策略配置
 type KisFuncConfig struct {
 	KisType string        `yaml:"kistype"`
-	Fid     string        `yaml:"fid"`
-	Fname   string        `yaml:"fname"`
-	Fmode   string        `yaml:"fmode"`
+	FName   string        `yaml:"fname"`
+	FMode   string        `yaml:"fmode"`
 	Source  KisSource     `yaml:"source"`
 	Option  KisFuncOption `yaml:"option"`
 }
 
 // NewFuncConfig 创建一个Function策略配置对象, 用于描述一个KisFunction信息
 func NewFuncConfig(
-	funcId string, funcName string, mode common.KisMode,
+	funcName string, mode common.KisMode,
 	source *KisSource, option *KisFuncOption) *KisFuncConfig {
 
 	config := new(KisFuncConfig)
-	config.Fid = funcId
-	config.Fname = funcName
+	config.FName = funcName
 
 	if source == nil {
-		log.Logger().ErrorF("funcName NewConfig Error, source is nil, funcName = %s\n", funcId)
+		log.Logger().ErrorF("funcName NewConfig Error, source is nil, funcName = %s\n", funcName)
 		return nil
 	}
 	config.Source = *source
 
-	config.Fmode = string(mode)
+	config.FMode = string(mode)
 
 	//FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
 	if mode == common.S || mode == common.L {
 		if option == nil {
 			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
 			return nil
-		} else if option.Cid == "" {
+		} else if option.CName == "" {
 			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
 			return nil
 		}

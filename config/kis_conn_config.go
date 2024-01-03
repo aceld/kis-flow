@@ -10,8 +10,6 @@ import (
 type KisConnConfig struct {
 	//配置类型
 	KisType string `yaml:"kistype"`
-	//唯一标识
-	CId string `yaml:"cid"`
 	//唯一描述标识
 	CName string `yaml:"cname"`
 	//基础存储媒介地址
@@ -28,9 +26,8 @@ type KisConnConfig struct {
 }
 
 // NewConnConfig 创建一个KisConnector策略配置对象, 用于描述一个KisConnector信息
-func NewConnConfig(cid string, cName string, addr string, t common.KisConnType, key string, param FParam) *KisConnConfig {
+func NewConnConfig(cName string, addr string, t common.KisConnType, key string, param FParam) *KisConnConfig {
 	strategy := new(KisConnConfig)
-	strategy.CId = cid
 	strategy.CName = cName
 	strategy.AddrString = addr
 
@@ -44,13 +41,13 @@ func NewConnConfig(cid string, cName string, addr string, t common.KisConnType, 
 // WithFunc Connector与Function进行关系绑定
 func (cConfig *KisConnConfig) WithFunc(fConfig *KisFuncConfig) error {
 
-	switch common.KisMode(fConfig.Fmode) {
+	switch common.KisMode(fConfig.FMode) {
 	case common.S:
-		cConfig.Save = append(cConfig.Save, fConfig.Fid)
+		cConfig.Save = append(cConfig.Save, fConfig.FName)
 	case common.L:
-		cConfig.Load = append(cConfig.Load, fConfig.Fid)
+		cConfig.Load = append(cConfig.Load, fConfig.FName)
 	default:
-		return errors.New(fmt.Sprintf("Wrong KisMode %s", fConfig.Fmode))
+		return errors.New(fmt.Sprintf("Wrong KisMode %s", fConfig.FMode))
 	}
 
 	return nil
