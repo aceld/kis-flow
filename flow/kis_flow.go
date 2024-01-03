@@ -8,6 +8,7 @@ import (
 	"kis-flow/function"
 	"kis-flow/id"
 	"kis-flow/kis"
+	"kis-flow/log"
 	"sync"
 )
 
@@ -28,8 +29,13 @@ type KisFlow struct {
 	PrevFunctionId string                  // 当前执行到的Function 上一层FunctionID(策略配置ID)
 
 	// Function列表参数
-	funcParams map[string]config.FParam // flow在当前Function的自定义固定配置参数,Key:function的实例NsID, value:FParam
+	funcParams map[string]config.FParam // flow在当前Function的自定义固定配置参数,Key:function的实例KisID, value:FParam
 	fplock     sync.RWMutex             // 管理funcParams的读写锁
+
+	// 数据
+	buffer common.KisRowArr  // 用来临时存放输入字节数据的内部Buf, 一条数据为interface{}, 多条数据为[]interface{} 也就是KisBatch
+	data   common.KisDataMap // 流式计算各个层级的数据源
+	inPut  common.KisRowArr  // 当前Function的计算输入数据
 }
 
 // NewKisFlow 创建一个KisFlow.
@@ -45,6 +51,9 @@ func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 	// Function列表
 	flow.Funcs = make(map[string]kis.Function)
 	flow.funcParams = make(map[string]config.FParam)
+
+	// 数据data
+	flow.data = make(common.KisDataMap)
 
 	return flow
 }
@@ -124,13 +133,43 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		return nil
 	}
 
+	// 因为此时还没有执行任何Function, 所以PrevFunctionId为FirstVirtual 因为没有上一层Function
+	flow.PrevFunctionId = common.FunctionIdFirstVirtual
+
+	// 提交数据流原始数据
+	if err := flow.commitSrcData(ctx); err != nil {
+		return err
+	}
+
 	//流式链式调用
 	for fn != nil {
+
+		// flow记录当前执行到的Function 标记
+		fid := fn.GetId()
+		flow.ThisFunction = fn
+		flow.ThisFunctionId = fid
+
+		// 得到当前Function要处理与的源数据
+		if inputData, err := flow.getCurData(); err != nil {
+			log.Logger().ErrorFX(ctx, "flow.Run(): getCurData err = %s\n", err.Error())
+			return err
+		} else {
+			flow.inPut = inputData
+		}
+
 		if err := fn.Call(ctx, flow); err != nil {
 			//Error
 			return err
 		} else {
 			//Success
+
+			if err := flow.commitCurData(ctx); err != nil {
+				return err
+			}
+
+			// 更新上一层FuncitonId游标
+			flow.PrevFunctionId = flow.ThisFunctionId
+
 			fn = fn.Next()
 		}
 	}

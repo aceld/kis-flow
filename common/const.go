@@ -1,6 +1,6 @@
 package common
 
-// KisIdType 用户生成KisId的字符串前缀
+// 用户生成KisId的字符串前缀
 const (
 	KisIdTypeFlow       = "flow"
 	KisIdTypeConnnector = "conn"
