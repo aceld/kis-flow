@@ -176,3 +176,15 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 
 	return nil
 }
+
+func (flow *KisFlow) GetName() string {
+	return flow.Name
+}
+
+func (flow *KisFlow) GetThisFunction() kis.Function {
+	return flow.ThisFunction
+}
+
+func (flow *KisFlow) GetThisFuncConf() *config.KisFuncConfig {
+	return flow.ThisFunction.GetConfig()
+}
