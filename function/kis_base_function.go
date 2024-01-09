@@ -15,7 +15,10 @@ type BaseFunction struct {
 	Config *config.KisFuncConfig
 
 	// flow
-	Flow kis.Flow //上下文环境KisFlow
+	flow kis.Flow //上下文环境KisFlow
+
+	// connector
+	connector kis.Connector
 
 	// link
 	N kis.Function //下一个流计算Function
@@ -80,12 +83,28 @@ func (base *BaseFunction) SetFlow(f kis.Flow) error {
 	if f == nil {
 		return errors.New("KisFlow is nil")
 	}
-	base.Flow = f
+	base.flow = f
 	return nil
 }
 
 func (base *BaseFunction) GetFlow() kis.Flow {
-	return base.Flow
+	return base.flow
+}
+
+// AddConnector 给当前Function实例添加一个Connector
+func (base *BaseFunction) AddConnector(conn kis.Connector) error {
+	if conn == nil {
+		return errors.New("conn is nil")
+	}
+
+	base.connector = conn
+
+	return nil
+}
+
+// GetConnector 获取当前Function实例所关联的Connector
+func (base *BaseFunction) GetConnector() kis.Connector {
+	return base.connector
 }
 
 func (base *BaseFunction) CreateId() {
@@ -119,11 +138,12 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	// 生成随机实例唯一ID
 	f.CreateId()
 
-	//设置基础信息属性
+	// 设置基础信息属性
 	if err := f.SetConfig(config); err != nil {
 		panic(err)
 	}
 
+	// 设置Flow
 	if err := f.SetFlow(flow); err != nil {
 		panic(err)
 	}

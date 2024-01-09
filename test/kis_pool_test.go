@@ -2,49 +2,21 @@ package test
 
 import (
 	"context"
-	"fmt"
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/flow"
 	"kis-flow/kis"
+	"kis-flow/test/faas"
 	"testing"
 )
-
-func funcName1Handler(ctx context.Context, flow kis.Flow) error {
-	fmt.Println("---> Call funcName1Handler ----")
-
-	for index, row := range flow.Input() {
-		// 打印数据
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
-		fmt.Println(str)
-
-		// 计算结果数据
-		resultStr := fmt.Sprintf("data from funcName[%s], index = %d", flow.GetThisFuncConf().FName, index)
-
-		// 提交结果数据
-		_ = flow.CommitRow(resultStr)
-	}
-
-	return nil
-}
-
-func funcName2Handler(ctx context.Context, flow kis.Flow) error {
-
-	for _, row := range flow.Input() {
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
-		fmt.Println(str)
-	}
-
-	return nil
-}
 
 func TestNewKisPool(t *testing.T) {
 
 	ctx := context.Background()
 
 	// 0. 注册Function
-	kis.Pool().FaaS("funcName1", funcName1Handler)
-	kis.Pool().FaaS("funcName2", funcName2Handler)
+	kis.Pool().FaaS("funcName1", faas.FuncDemo1Handler)
+	kis.Pool().FaaS("funcName2", faas.FuncDemo2Handler)
 
 	// 1. 创建2个KisFunction配置实例
 	source1 := config.KisSource{

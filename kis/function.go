@@ -21,6 +21,11 @@ type Function interface {
 	// GetFlow 获取当前Functioin实力所依赖的Flow
 	GetFlow() Flow
 
+	// AddConnector 给当前Function实例添加一个Connector
+	AddConnector(conn Connector) error
+	// GetConnector 获取当前Function实例所关联的Connector
+	GetConnector() Connector
+
 	// CreateId 给当前Funciton实力生成一个随机的实例KisID
 	CreateId()
 	// GetId 获取当前Function的FID

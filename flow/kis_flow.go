@@ -5,6 +5,7 @@ import (
 	"errors"
 	"kis-flow/common"
 	"kis-flow/config"
+	"kis-flow/conn"
 	"kis-flow/function"
 	"kis-flow/id"
 	"kis-flow/kis"
@@ -62,8 +63,29 @@ func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 // fConf: 当前Function策略
 // fParams: 当前Flow携带的Function动态参数
 func (flow *KisFlow) Link(fConf *config.KisFuncConfig, fParams config.FParam) error {
-	// 创建Function
+	// 创建Function实例
 	f := function.NewKisFunction(flow, fConf)
+
+	if fConf.Option.CName != "" {
+		// 当前Function有Connector关联，需要初始化Connector实例
+
+		// 获取Connector配置
+		connConfig, err := fConf.GetConnConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		// 创建Connector对象
+		connector := conn.NewKisConnector(connConfig)
+
+		// 初始化Connector, 执行Connector Init 方法
+		if err = connector.Init(); err != nil {
+			panic(err)
+		}
+
+		// 关联Function实例和Connector实例关系
+		_ = f.AddConnector(connector)
+	}
 
 	// Flow 添加 Function
 	if err := flow.appendFunc(f, fParams); err != nil {
@@ -187,4 +209,22 @@ func (flow *KisFlow) GetThisFunction() kis.Function {
 
 func (flow *KisFlow) GetThisFuncConf() *config.KisFuncConfig {
 	return flow.ThisFunction.GetConfig()
+}
+
+// GetConnector 得到当前正在执行的Function的Connector
+func (flow *KisFlow) GetConnector() (kis.Connector, error) {
+	if conn := flow.ThisFunction.GetConnector(); conn != nil {
+		return conn, nil
+	} else {
+		return nil, errors.New("GetConnector(): Connector is nil")
+	}
+}
+
+// GetConnConf 得到当前正在执行的Function的Connector的配置
+func (flow *KisFlow) GetConnConf() (*config.KisConnConfig, error) {
+	if conn := flow.ThisFunction.GetConnector(); conn != nil {
+		return conn.GetConfig(), nil
+	} else {
+		return nil, errors.New("GetConnConf(): Connector is nil")
+	}
 }
