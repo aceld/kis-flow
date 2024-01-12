@@ -1,0 +1,13 @@
+kistype: func
+fname: funcName3
+fmode: Calculate
+source:
+    name: 用户订单错误率
+    must:
+        - order_id
+        - user_id
+option:
+    cname: ""
+    retry_times: 0
+    return_duration: 0
+    default_params: {}

@@ -25,4 +25,8 @@ type Flow interface {
 	GetConnector() (Connector, error)
 	// GetConnConf 得到当前正在执行的Function的Connector的配置
 	GetConnConf() (*config.KisConnConfig, error)
+	// GetConfig 得到当前Flow的配置
+	GetConfig() *config.KisFlowConfig
+	// GetFuncConfigByName 得到当前Flow的配置
+	GetFuncConfigByName(funcName string) *config.KisFuncConfig
 }

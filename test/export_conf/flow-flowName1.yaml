@@ -1,0 +1,10 @@
+kistype: flow
+status: 1
+flow_name: flowName1
+flows:
+    - fname: funcName1
+      params: {}
+    - fname: funcName2
+      params: {}
+    - fname: funcName3
+      params: {}

@@ -1,0 +1,8 @@
+kistype: func
+fname: funcName1
+fmode: Verify
+source:
+  name: 公众号抖音商城户订单数据
+  must:
+    - order_id
+    - user_id

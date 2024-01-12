@@ -1,0 +1,10 @@
+kistype: func
+fname: funcName2
+fmode: Save
+source:
+  name: 用户订单错误率
+  must:
+    - order_id
+    - user_id
+option:
+  cname: ConnName1

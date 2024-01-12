@@ -1,0 +1,8 @@
+kistype: func
+fname: funcName3
+fmode: Calculate
+source:
+  name: 用户订单错误率
+  must:
+    - order_id
+    - user_id

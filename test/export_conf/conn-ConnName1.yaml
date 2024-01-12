@@ -1,0 +1,12 @@
+kistype: conn
+cname: ConnName1
+addrs: 0.0.0.0:9988,0.0.0.0:9999,0.0.0.0:9990
+type: redis
+key: redis-key
+params:
+    args1: value1
+    args2: value2
+load: []
+save:
+    - funcName2
+    - funcName2
