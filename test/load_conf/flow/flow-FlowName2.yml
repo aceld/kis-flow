@@ -1,0 +1,7 @@
+kistype: flow
+status: 1
+flow_name: flowName2
+flows:
+  - fname: funcName1
+  - fname: abortFunc
+  - fname: funcName3

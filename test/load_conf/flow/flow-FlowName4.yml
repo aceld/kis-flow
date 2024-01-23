@@ -1,0 +1,7 @@
+kistype: flow
+status: 1
+flow_name: flowName4
+flows:
+  - fname: funcName1
+  - fname: noResultFunc
+  - fname: funcName3

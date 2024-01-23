@@ -1,0 +1,8 @@
+kistype: func
+fname: noResultFunc
+fmode: Calculate
+source:
+  name: 用户订单错误率
+  must:
+    - order_id
+    - user_id
