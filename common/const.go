@@ -54,3 +54,7 @@ const (
 	TIDB  KisConnType = "tidb"
 	ES    KisConnType = "es"
 )
+
+const (
+	ActionNoJump = "NoJump"
+)

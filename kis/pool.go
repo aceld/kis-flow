@@ -62,7 +62,7 @@ func (pool *kisPool) AddFlow(name string, flow Flow) {
 		panic(errString)
 	}
 
-	log.Logger().InfoF("Add FlowRouter FlowName=%s\n", name)
+	log.Logger().InfoF("Add FlowRouter FlowName=%s", name)
 }
 
 func (pool *kisPool) GetFlow(name string) Flow {

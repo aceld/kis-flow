@@ -62,26 +62,63 @@ func (flow *KisFlow) getCurData() (common.KisRowArr, error) {
 	return flow.data[flow.PrevFunctionId], nil
 }
 
+// commitReuseData
+func (flow *KisFlow) commitReuseData(ctx context.Context) error {
+
+	// 判断上层是否有结果数据, 如果没有则退出本次Flow Run循环
+	if len(flow.data[flow.PrevFunctionId]) == 0 {
+		flow.abort = true
+		return nil
+	}
+
+	// 本层结果数据等于上层结果数据(复用上层结果数据到本层)
+	flow.data[flow.ThisFunctionId] = flow.data[flow.PrevFunctionId]
+
+	// 清空缓冲Buf (如果是ReuseData选项，那么提交的全部数据，都将不会携带到下一层)
+	flow.buffer = flow.buffer[0:0]
+
+	log.Logger().DebugFX(ctx, " ====> After commitReuseData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+
+	return nil
+}
+
+func (flow *KisFlow) commitVoidData(ctx context.Context) error {
+	if len(flow.buffer) != 0 {
+		return nil
+	}
+
+	// 制作空数据
+	batch := make(common.KisRowArr, 0)
+
+	// 将本层计算的缓冲数据提交到本层结果数据中
+	flow.data[flow.ThisFunctionId] = batch
+
+	log.Logger().DebugFX(ctx, " ====> After commitVoidData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+
+	return nil
+}
+
 //commitCurData 提交Flow当前执行Function的结果数据
 func (flow *KisFlow) commitCurData(ctx context.Context) error {
 
-	//判断本层计算是否有结果数据,如果没有则退出本次Flow Run循环
+	// 判断本层计算是否有结果数据,如果没有则退出本次Flow Run循环
 	if len(flow.buffer) == 0 {
+		flow.abort = true
 		return nil
 	}
 
 	// 制作批量数据batch
 	batch := make(common.KisRowArr, 0, len(flow.buffer))
 
-	//如果strBuf为空，则没有添加任何数据
+	// 如果strBuf为空，则没有添加任何数据
 	for _, row := range flow.buffer {
 		batch = append(batch, row)
 	}
 
-	//将本层计算的缓冲数据提交到本层结果数据中
+	// 将本层计算的缓冲数据提交到本层结果数据中
 	flow.data[flow.ThisFunctionId] = batch
 
-	//清空缓冲Buf
+	// 清空缓冲Buf
 	flow.buffer = flow.buffer[0:0]
 
 	log.Logger().DebugFX(ctx, " ====> After commitCurData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
@@ -89,7 +126,7 @@ func (flow *KisFlow) commitCurData(ctx context.Context) error {
 	return nil
 }
 
-//ClearData 清空flow所有数据
+// clearData 清空flow所有数据
 func (flow *KisFlow) clearData(data common.KisDataMap) {
 	for k := range data {
 		delete(data, k)
