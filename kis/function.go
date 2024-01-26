@@ -43,4 +43,8 @@ type Function interface {
 	SetN(f Function)
 	// SetP 设置上一层Function实例
 	SetP(f Function)
+	// GetMetaData 得到当前Function的临时数据
+	GetMetaData(key string) interface{}
+	// SetMetaData 设置当前Function的临时数据
+	SetMetaData(key string, value interface{})
 }

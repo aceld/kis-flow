@@ -3,5 +3,14 @@ status: 1
 flow_name: flowName1
 flows:
   - fname: funcName1
+    params:
+      myKey1: flowValue1-1
+      myKey2: flowValue1-2
   - fname: funcName2
+    params:
+      myKey1: flowValue2-1
+      myKey2: flowValue2-2
   - fname: funcName3
+    params:
+      myKey1: flowValue3-1
+      myKey2: flowValue3-2

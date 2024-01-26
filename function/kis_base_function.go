@@ -7,6 +7,7 @@ import (
 	"kis-flow/config"
 	"kis-flow/id"
 	"kis-flow/kis"
+	"sync"
 )
 
 type BaseFunction struct {
@@ -19,6 +20,11 @@ type BaseFunction struct {
 
 	// connector
 	connector kis.Connector
+
+	// Function的自定义临时数据
+	metaData map[string]interface{}
+	// 管理metaData的读写锁
+	mLock sync.RWMutex
 
 	// link
 	N kis.Function //下一个流计算Function
@@ -120,16 +126,15 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	//工厂生产泛化对象
 	switch common.KisMode(config.FMode) {
 	case common.V:
-		f = new(KisFunctionV)
-		break
+		f = NewKisFunctionV()
 	case common.S:
-		f = new(KisFunctionS)
+		f = NewKisFunctionS()
 	case common.L:
-		f = new(KisFunctionL)
+		f = NewKisFunctionL()
 	case common.C:
-		f = new(KisFunctionC)
+		f = NewKisFunctionC()
 	case common.E:
-		f = new(KisFunctionE)
+		f = NewKisFunctionE()
 	default:
 		//LOG ERROR
 		return nil
@@ -149,4 +154,25 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	}
 
 	return f
+}
+
+// GetMetaData 得到当前Function的临时数据
+func (base *BaseFunction) GetMetaData(key string) interface{} {
+	base.mLock.RLock()
+	defer base.mLock.RUnlock()
+
+	data, ok := base.metaData[key]
+	if !ok {
+		return nil
+	}
+
+	return data
+}
+
+// SetMetaData 设置当前Function的临时数据
+func (base *BaseFunction) SetMetaData(key string, value interface{}) {
+	base.mLock.Lock()
+	defer base.mLock.Unlock()
+
+	base.metaData[key] = value
 }

@@ -22,9 +22,8 @@ type kisPool struct {
 	cInitRouter connInitRouter // 全部的Connector初始化路由
 	ciLock      sync.RWMutex   // cInitRouter 锁
 
-	cTree      connTree             //全部Connector管理路由
-	connectors map[string]Connector // 全部的Connector对象
-	cLock      sync.RWMutex         // cTree 锁
+	cTree connTree     // 全部Connector管理路由
+	cLock sync.RWMutex // cTree 锁
 }
 
 // 单例
@@ -45,7 +44,6 @@ func Pool() *kisPool {
 		// connTree初始化
 		_pool.cTree = make(connTree)
 		_pool.cInitRouter = make(connInitRouter)
-		_pool.connectors = make(map[string]Connector)
 	})
 
 	return _pool

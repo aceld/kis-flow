@@ -6,3 +6,7 @@ source:
   must:
     - order_id
     - user_id
+option:
+  default_params:
+    default1: funcName1_param1
+    default2: funcName1_param2

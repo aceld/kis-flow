@@ -10,6 +10,15 @@ type KisFunctionV struct {
 	BaseFunction
 }
 
+func NewKisFunctionV() kis.Function {
+	f := new(KisFunctionV)
+
+	// 初始化metaData
+	f.metaData = make(map[string]interface{})
+
+	return f
+}
+
 func (f *KisFunctionV) Call(ctx context.Context, flow kis.Flow) error {
 	log.Logger().InfoF("KisFunctionV, flow = %+v\n", flow)
 

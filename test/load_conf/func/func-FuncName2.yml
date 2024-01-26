@@ -8,3 +8,6 @@ source:
     - user_id
 option:
   cname: ConnName1
+  default_params:
+    default1: funcName2_param1
+    default2: funcName2_param2

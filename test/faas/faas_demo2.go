@@ -11,6 +11,7 @@ import (
 
 func FuncDemo2Handler(ctx context.Context, flow kis.Flow) error {
 	fmt.Println("---> Call funcName2Handler ----")
+	fmt.Printf("Params = %+v\n", flow.GetFuncParamAll())
 
 	for index, row := range flow.Input() {
 		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)

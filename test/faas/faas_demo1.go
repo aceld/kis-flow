@@ -10,6 +10,7 @@ import (
 
 func FuncDemo1Handler(ctx context.Context, flow kis.Flow) error {
 	fmt.Println("---> Call funcName1Handler ----")
+	fmt.Printf("Params = %+v\n", flow.GetFuncParamAll())
 
 	for index, row := range flow.Input() {
 		// 打印数据
