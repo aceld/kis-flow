@@ -44,4 +44,8 @@ type Flow interface {
 	GetFuncParam(key string) string
 	// GetFuncParamAll 得到Flow的当前正在执行的Function的配置默认参数，取出全部Key-Value
 	GetFuncParamAll() config.FParam
+	// GetFuncParamsAllFuncs 得到Flow中所有Function的FuncParams，取出全部Key-Value
+	GetFuncParamsAllFuncs() map[string]config.FParam
+	// Fork 得到Flow的一个副本(深拷贝)
+	Fork(ctx context.Context) Flow
 }

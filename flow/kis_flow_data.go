@@ -200,3 +200,11 @@ func (flow *KisFlow) GetFuncParamAll() config.FParam {
 
 	return param
 }
+
+// GetFuncParamsAllFuncs 得到Flow中所有Function的FuncParams，取出全部Key-Value
+func (flow *KisFlow) GetFuncParamsAllFuncs() map[string]config.FParam {
+	flow.fplock.RLock()
+	defer flow.fplock.RUnlock()
+
+	return flow.funcParams
+}

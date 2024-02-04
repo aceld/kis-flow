@@ -76,6 +76,30 @@ func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 	return flow
 }
 
+// Fork 得到Flow的一个副本(深拷贝)
+func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
+
+	config := flow.Conf
+
+	// 通过之前的配置生成一个新的Flow
+	newFlow := NewKisFlow(config)
+
+	for _, fp := range flow.Conf.Flows {
+		if _, ok := flow.funcParams[flow.Funcs[fp.FuncName].GetId()]; !ok {
+			//当前function没有配置Params
+			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), nil)
+		} else {
+			//当前function有配置Params
+			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), fp.Params)
+		}
+	}
+
+	log.Logger().DebugFX(ctx, "=====>Flow Fork, oldFlow.funcParams = %+v\n", flow.funcParams)
+	log.Logger().DebugFX(ctx, "=====>Flow Fork, newFlow.funcParams = %+v\n", newFlow.GetFuncParamsAllFuncs())
+
+	return newFlow
+}
+
 // Link 将Function链接到Flow中
 // fConf: 当前Function策略
 // fParams: 当前Flow携带的Function动态参数
