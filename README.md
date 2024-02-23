@@ -150,6 +150,89 @@ prometheus_serve: 0.0.0.0:20004
 ```
 
 
+## Example
+
+下面是简单的应用场景案例，具体应用单元用例请 参考
+https://github.com/aceld/kis-flow/tree/master/test
+
+### 主流程
+
+```go
+import (
+    "context"
+    "kis-flow/file"
+    "kis-flow/kis"
+    "kis-flow/test/faas"
+    "testing"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // 1. 加载配置文件并构建Flow
+    if err := file.ConfigImportYaml("/Users/tal/gopath/src/kis-flow/test/load_conf/"); err != nil {
+        panic(err)
+    }
+
+    // 2. 获取Flow
+    flow1 := kis.Pool().GetFlow("flowName1")
+
+    // 3. 提交原始数据
+    _ = flow1.CommitRow("This is Data1 from Test")
+    _ = flow1.CommitRow("This is Data2 from Test")
+    _ = flow1.CommitRow("This is Data3 from Test")
+
+    // 4. 执行flow1
+    if err := flow1.Run(ctx); err != nil {
+        panic(err)
+    }
+}
+
+func init() {
+    kis.Pool().FaaS("funcName1", FuncDemo1Handler)
+    kis.Pool().FaaS("funcName2", FuncDemo2Handler)
+    kis.Pool().FaaS("funcName3", FuncDemo3Handler)
+}
+
+```
+
+### 计算逻辑
+
+```go
+package faas
+
+import (
+	"context"
+	"fmt"
+	"kis-flow/kis"
+)
+
+// type FaaS func(context.Context, Flow) error
+
+func FuncDemo1Handler(ctx context.Context, flow kis.Flow) error {
+	fmt.Println("---> Call funcName1Handler ----")
+	fmt.Printf("Params = %+v\n", flow.GetFuncParamAll())
+
+	for index, row := range flow.Input() {
+		// 打印数据
+		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
+		fmt.Println(str)
+
+		// 计算结果数据
+		resultStr := fmt.Sprintf("data from funcName[%s], index = %d", flow.GetThisFuncConf().FName, index)
+
+		// 提交结果数据
+		_ = flow.CommitRow(resultStr)
+	}
+
+	return flow.Next()
+}
+
+// ... FuncDemo2Handler
+
+// ... FuncDemo3Handler
+```
+
 
 
 ---
