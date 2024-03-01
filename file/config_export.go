@@ -3,9 +3,9 @@ package file
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"kis-flow/common"
 	"kis-flow/kis"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
@@ -17,7 +17,7 @@ func ConfigExportYaml(flow kis.Flow, savaPath string) error {
 		return err
 	} else {
 		// flow
-		err := ioutil.WriteFile(savaPath+common.KisIdTypeFlow+"-"+flow.GetName()+".yaml", data, 0644)
+		err := os.WriteFile(savaPath+common.KisIdTypeFlow+"-"+flow.GetName()+".yaml", data, 0644)
 		if err != nil {
 			return err
 		}
@@ -32,7 +32,7 @@ func ConfigExportYaml(flow kis.Flow, savaPath string) error {
 			if fdata, err := yaml.Marshal(fConf); err != nil {
 				return err
 			} else {
-				if err := ioutil.WriteFile(savaPath+common.KisIdTypeFunction+"-"+fp.FuncName+".yaml", fdata, 0644); err != nil {
+				if err := os.WriteFile(savaPath+common.KisIdTypeFunction+"-"+fp.FuncName+".yaml", fdata, 0644); err != nil {
 					return err
 				}
 			}
@@ -46,7 +46,7 @@ func ConfigExportYaml(flow kis.Flow, savaPath string) error {
 				if cdata, err := yaml.Marshal(cConf); err != nil {
 					return err
 				} else {
-					if err := ioutil.WriteFile(savaPath+common.KisIdTypeConnector+"-"+cConf.CName+".yaml", cdata, 0644); err != nil {
+					if err := os.WriteFile(savaPath+common.KisIdTypeConnector+"-"+cConf.CName+".yaml", cdata, 0644); err != nil {
 						return err
 					}
 				}

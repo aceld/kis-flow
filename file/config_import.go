@@ -3,7 +3,6 @@ package file
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/flow"
@@ -92,7 +91,7 @@ func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 		}
 
 		// 读取文件内容
-		confData, err := ioutil.ReadFile(filePath)
+		confData, err := os.ReadFile(filePath)
 		if err != nil {
 			return err
 		}
