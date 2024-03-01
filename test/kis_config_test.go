@@ -14,9 +14,9 @@ func TestNewFuncConfig(t *testing.T) {
 	}
 
 	option := config.KisFuncOption{
-		CName:        "connectorName1",
-		RetryTimes:   3,
-		RetryDuriton: 300,
+		CName:         "connectorName1",
+		RetryTimes:    3,
+		RetryDuration: 300,
 
 		Params: config.FParam{
 			"param1": "value1",
@@ -61,9 +61,9 @@ func TestNewConnConfig(t *testing.T) {
 	}
 
 	option := config.KisFuncOption{
-		CName:        "connectorName1",
-		RetryTimes:   3,
-		RetryDuriton: 300,
+		CName:         "connectorName1",
+		RetryTimes:    3,
+		RetryDuration: 300,
 
 		Params: config.FParam{
 			"param1": "value1",
