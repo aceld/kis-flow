@@ -3,7 +3,6 @@ package flow
 import (
 	"context"
 	"errors"
-	"github.com/patrickmn/go-cache"
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/conn"
@@ -13,6 +12,8 @@ import (
 	"kis-flow/log"
 	"sync"
 	"time"
+
+	"github.com/patrickmn/go-cache"
 )
 
 // KisFlow 用于贯穿整条流式计算的上下文环境
@@ -79,17 +80,17 @@ func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 // Fork 得到Flow的一个副本(深拷贝)
 func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 
-	config := flow.Conf
+	cfg := flow.Conf
 
 	// 通过之前的配置生成一个新的Flow
-	newFlow := NewKisFlow(config)
+	newFlow := NewKisFlow(cfg)
 
 	for _, fp := range flow.Conf.Flows {
 		if _, ok := flow.funcParams[flow.Funcs[fp.FuncName].GetId()]; !ok {
-			//当前function没有配置Params
+			// 当前function没有配置Params
 			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), nil)
 		} else {
-			//当前function有配置Params
+			// 当前function有配置Params
 			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), fp.Params)
 		}
 	}
@@ -163,16 +164,16 @@ func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) err
 		flow.FlowTail = function
 	}
 
-	//将Function Name 详细Hash对应关系添加到flow对象中
+	// 将Function Name 详细Hash对应关系添加到flow对象中
 	flow.Funcs[function.GetConfig().FName] = function
 
-	//先添加function 默认携带的Params参数
+	// 先添加function 默认携带的Params参数
 	params := make(config.FParam)
 	for key, value := range function.GetConfig().Option.Params {
 		params[key] = value
 	}
 
-	//再添加flow携带的function定义参数(重复即覆盖)
+	// 再添加flow携带的function定义参数(重复即覆盖)
 	for key, value := range fParam {
 		params[key] = value
 	}
@@ -193,7 +194,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 	flow.abort = false
 
 	if flow.Conf.Status == int(common.FlowDisable) {
-		//flow被配置关闭
+		// flow被配置关闭
 		return nil
 	}
 
@@ -205,7 +206,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		return err
 	}
 
-	//流式链式调用
+	// 流式链式调用
 	for fn != nil && flow.abort == false {
 
 		// flow记录当前执行到的Function 标记
@@ -222,10 +223,10 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		}
 
 		if err := fn.Call(ctx, flow); err != nil {
-			//Error
+			// Error
 			return err
 		} else {
-			//Success
+			// Success
 			fn, err = flow.dealAction(ctx, fn)
 			if err != nil {
 				return err
@@ -259,8 +260,8 @@ func (flow *KisFlow) GetThisFuncConf() *config.KisFuncConfig {
 
 // GetConnector 得到当前正在执行的Function的Connector
 func (flow *KisFlow) GetConnector() (kis.Connector, error) {
-	if conn := flow.ThisFunction.GetConnector(); conn != nil {
-		return conn, nil
+	if connector := flow.ThisFunction.GetConnector(); connector != nil {
+		return connector, nil
 	} else {
 		return nil, errors.New("GetConnector(): Connector is nil")
 	}
@@ -268,8 +269,8 @@ func (flow *KisFlow) GetConnector() (kis.Connector, error) {
 
 // GetConnConf 得到当前正在执行的Function的Connector的配置
 func (flow *KisFlow) GetConnConf() (*config.KisConnConfig, error) {
-	if conn := flow.ThisFunction.GetConnector(); conn != nil {
-		return conn.GetConfig(), nil
+	if connector := flow.ThisFunction.GetConnector(); connector != nil {
+		return connector.GetConfig(), nil
 	} else {
 		return nil, errors.New("GetConnConf(): Connector is nil")
 	}

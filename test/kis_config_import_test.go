@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestConfigImportYmal(t *testing.T) {
+func TestConfigImportYaml(t *testing.T) {
 	ctx := context.Background()
 
 	// 0. 注册Function 回调业务

@@ -29,7 +29,7 @@ type KisConnector struct {
 // NewKisConnector 根据配置策略创建一个KisConnector
 func NewKisConnector(config *config.KisConnConfig) *KisConnector {
 	conn := new(KisConnector)
-	conn.CId = id.KisID(common.KisIdTypeConnnector)
+	conn.CId = id.KisID(common.KisIdTypeConnector)
 	conn.CName = config.CName
 	conn.Conf = config
 	conn.metaData = make(map[string]interface{})
@@ -41,7 +41,7 @@ func NewKisConnector(config *config.KisConnConfig) *KisConnector {
 func (conn *KisConnector) Init() error {
 	var err error
 
-	//一个Connector只能执行初始化业务一次
+	// 一个Connector只能执行初始化业务一次
 	conn.onceInit.Do(func() {
 		err = kis.Pool().CallConnInit(conn)
 	})
