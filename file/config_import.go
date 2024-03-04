@@ -9,6 +9,7 @@ import (
 	"kis-flow/config"
 	"kis-flow/flow"
 	"kis-flow/kis"
+	"kis-flow/metrics"
 	"os"
 	"path"
 	"path/filepath"
@@ -62,7 +63,7 @@ func kisTypeFuncConfigure(all *allConfig, confData []byte, fileName string, kisT
 func kisTypeConnConfigure(all *allConfig, confData []byte, fileName string, kisType interface{}) error {
 	conn := new(config.KisConnConfig)
 	if ok := yaml.Unmarshal(confData, conn); ok != nil {
-		return errors.New(fmt.Sprintf("%s is wrong format nsType = %s", fileName, kisType))
+		return errors.New(fmt.Sprintf("%s is wrong format kisType = %s", fileName, kisType))
 	}
 
 	if _, ok := all.Conns[conn.CName]; ok {
@@ -71,6 +72,19 @@ func kisTypeConnConfigure(all *allConfig, confData []byte, fileName string, kisT
 
 	// 加入配置集合中
 	all.Conns[conn.CName] = conn
+
+	return nil
+}
+
+// kisTypeGlobalConfigure 解析Global配置文件，yaml格式
+func kisTypeGlobalConfigure(confData []byte, fileName string, kisType interface{}) error {
+	// 全局配置
+	if ok := yaml.Unmarshal(confData, config.GlobalConfig); ok != nil {
+		return errors.New(fmt.Sprintf("%s is wrong format kisType = %s", fileName, kisType))
+	}
+
+	// 启动Metrics服务
+	metrics.RunMetrics()
 
 	return nil
 }
@@ -116,6 +130,9 @@ func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 
 			case common.KisIdTypeConnnector:
 				return kisTypeConnConfigure(all, confData, filePath, kisType)
+
+			case common.KisIdTypeGlobal:
+				return kisTypeGlobalConfigure(confData, filePath, kisType)
 
 			default:
 				return errors.New(fmt.Sprintf("%s set wrong kistype %s", filePath, kisType))

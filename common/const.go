@@ -64,3 +64,11 @@ const (
 	// DefaultExpiration 默认GoCahce时间 ，永久保存
 	DefaultExpiration time.Duration = 0
 )
+
+// metrics
+const (
+	METRICS_ROUTE string = "/metrics"
+
+	COUNTER_KISFLOW_DATA_TOTAL_NAME string = "kisflow_data_total"
+	COUNTER_KISFLOW_DATA_TOTAL_HELP string = "KisFlow全部Flow的数据总量"
+)
