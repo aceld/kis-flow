@@ -8,6 +8,7 @@ import (
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/log"
+	"kis-flow/metrics"
 	"time"
 )
 
@@ -46,6 +47,12 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 
 	// 清空缓冲Buf
 	flow.buffer = flow.buffer[0:0]
+
+	// 首次提交数据源数据，进行统计数据总量
+	if config.GlobalConfig.EnableProm == true {
+		// 统计数据总量 Metrics.DataTota 指标累计加1
+		metrics.Metrics.DataTotal.Add(float64(dataCnt))
+	}
 
 	log.Logger().DebugFX(ctx, "====> After CommitSrcData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
 
