@@ -17,7 +17,7 @@ Gitee(China)
 Git: https://gitee.com/Aceld/kis-flow
 
 
-## 开发及教程文档(持续更新中...)
+## 开发及教程文档
 
 
 KisFlow 采用开发教程同步执行 
