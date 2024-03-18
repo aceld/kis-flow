@@ -52,6 +52,9 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 	if config.GlobalConfig.EnableProm == true {
 		// 统计数据总量 Metrics.DataTota 指标累计加1
 		metrics.Metrics.DataTotal.Add(float64(dataCnt))
+
+		//统计当前Flow数量指标
+		metrics.Metrics.FlowDataTotal.WithLabelValues(flow.Name).Add(float64(dataCnt))
 	}
 
 	log.Logger().DebugFX(ctx, "====> After CommitSrcData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)

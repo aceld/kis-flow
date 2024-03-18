@@ -3,6 +3,7 @@ package flow
 import (
 	"context"
 	"errors"
+	"github.com/prometheus/client_golang/prometheus"
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/conn"
@@ -10,6 +11,7 @@ import (
 	"kis-flow/id"
 	"kis-flow/kis"
 	"kis-flow/log"
+	"kis-flow/metrics"
 	"sync"
 	"time"
 
@@ -198,12 +200,24 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		return nil
 	}
 
+	// Metrics
+	var funcStart time.Time
+	var flowStart time.Time
+
 	// 因为此时还没有执行任何Function, 所以PrevFunctionId为FirstVirtual 因为没有上一层Function
 	flow.PrevFunctionId = common.FunctionIdFirstVirtual
 
 	// 提交数据流原始数据
 	if err := flow.commitSrcData(ctx); err != nil {
 		return err
+	}
+
+	// Metrics
+	if config.GlobalConfig.EnableProm == true {
+		// 统计Flow的调度次数
+		metrics.Metrics.FlowScheduleCntsToTal.WithLabelValues(flow.Name).Inc()
+		// 统计Flow的执行消耗时长
+		flowStart = time.Now()
 	}
 
 	// 流式链式调用
@@ -213,6 +227,17 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		fid := fn.GetId()
 		flow.ThisFunction = fn
 		flow.ThisFunctionId = fid
+
+		fName := fn.GetConfig().FName
+		fMode := fn.GetConfig().FMode
+
+		if config.GlobalConfig.EnableProm == true {
+			// 统计Function调度次数
+			metrics.Metrics.FuncScheduleCntsTotal.WithLabelValues(fName, fMode).Inc()
+
+			// 统计Function 耗时 记录开始时间
+			funcStart = time.Now()
+		}
 
 		// 得到当前Function要处理与的源数据
 		if inputData, err := flow.getCurData(); err != nil {
@@ -231,7 +256,27 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
+
+			// 统计Function 耗时
+			if config.GlobalConfig.EnableProm == true {
+				// Function消耗时间
+				duration := time.Since(funcStart)
+
+				// 统计当前Function统计指标,做时间统计
+				metrics.Metrics.FunctionDuration.With(
+					prometheus.Labels{
+						common.LABEL_FUNCTION_NAME: fName,
+						common.LABEL_FUNCTION_MODE: fMode}).Observe(duration.Seconds() * 1000)
+			}
+
 		}
+	}
+
+	// Metrics
+	if config.GlobalConfig.EnableProm == true {
+		// 统计Flow执行耗时
+		duration := time.Since(flowStart)
+		metrics.Metrics.FlowDuration.WithLabelValues(flow.Name).Observe(duration.Seconds() * 1000)
 	}
 
 	return nil
