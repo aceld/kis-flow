@@ -1,4 +1,4 @@
-:package kis
+package kis
 
 import (
 	"reflect"
