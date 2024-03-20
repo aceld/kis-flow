@@ -15,9 +15,7 @@ func (f DefaultFaasSerialize) DecodeParam(arr common.KisRowArr, r reflect.Type) 
 	if r.Kind() != reflect.Slice {
 		return reflect.Value{}, fmt.Errorf("r must be a slice")
 	}
-
 	slice := reflect.MakeSlice(r, 0, len(arr))
-
 	for _, row := range arr {
 		var elem reflect.Value
 		var err error
@@ -28,7 +26,6 @@ func (f DefaultFaasSerialize) DecodeParam(arr common.KisRowArr, r reflect.Type) 
 			// 如果失败，则尝试直接反序列化为字符串
 			elem, err = decodeString(row)
 			if err != nil {
-				fmt.Println("---+++-", row)
 				// 如果还失败，则尝试先序列化为 JSON 再反序列化
 				elem, err = decodeJSON(row, r.Elem())
 				if err != nil {

@@ -39,7 +39,6 @@ func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
 
 	for i := 0; i < funcType.NumIn(); i++ {
 		paramType := funcType.In(i)
-		fmt.Println(paramType.Kind(), isFlowType(paramType))
 		if isFlowType(paramType) {
 			containsKisflowCtx = true
 		}
