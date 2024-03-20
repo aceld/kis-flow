@@ -23,7 +23,7 @@ func TestForkFlow(t *testing.T) {
 	kis.Pool().CaaS("ConnName1", "funcName2", common.S, caas.CaasDemoHanler1)
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/tal/gopath/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("/Users/aceld/gopath/src/kis-flow/test/load_conf/"); err != nil {
 		panic(err)
 	}
 
