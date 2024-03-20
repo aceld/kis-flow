@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"kis-flow/common"
 	"kis-flow/log"
+	"reflect"
 	"sync"
 )
 
 var _poolOnce sync.Once
 
-//  kisPool 用于管理全部的Function和Flow配置的池子
+// kisPool 用于管理全部的Function和Flow配置的池子
 type kisPool struct {
 	fnRouter funcRouter   // 全部的Function管理路由
 	fnLock   sync.RWMutex // fnRouter 锁
@@ -76,11 +77,17 @@ func (pool *kisPool) GetFlow(name string) Flow {
 
 // FaaS 注册 Function 计算业务逻辑, 通过Function Name 索引及注册
 func (pool *kisPool) FaaS(fnName string, f FaaS) {
+
+	faaSDesc, err := NewFaaSDesc(fnName, f)
+	if err != nil {
+		panic(err)
+	}
+
 	pool.fnLock.Lock() // 写锁
 	defer pool.fnLock.Unlock()
 
 	if _, ok := pool.fnRouter[fnName]; !ok {
-		pool.fnRouter[fnName] = f
+		pool.fnRouter[fnName] = faaSDesc
 	} else {
 		errString := fmt.Sprintf("KisPoll FaaS Repeat FuncName=%s", fnName)
 		panic(errString)
@@ -91,11 +98,38 @@ func (pool *kisPool) FaaS(fnName string, f FaaS) {
 
 // CallFunction 调度 Function
 func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow) error {
+	if funcDesc, ok := pool.fnRouter[fnName]; ok {
+		params := make([]reflect.Value, 0, funcDesc.ArgNum)
 
-	if f, ok := pool.fnRouter[fnName]; ok {
-		return f(ctx, flow)
+		for _, argType := range funcDesc.ArgsType {
+			if isFlowType(argType) {
+				params = append(params, reflect.ValueOf(flow))
+				continue
+			}
+			if isContextType(argType) {
+				params = append(params, reflect.ValueOf(ctx))
+				continue
+			}
+			if argType.Kind() == reflect.Slice {
+				value, err := funcDesc.FaasSerialize.DecodeParam(flow.Input(), argType)
+				if err != nil {
+					log.Logger().ErrorFX(ctx, "funcDesc.FaasSerialize.DecodeParam err=%v", err)
+				} else {
+					params = append(params, value)
+					continue
+				}
+			}
+			params = append(params, reflect.Zero(argType))
+		}
+
+		retValues := funcDesc.FuncValue.Call(params)
+		ret := retValues[0].Interface()
+		if ret == nil {
+			return nil
+		}
+		return retValues[0].Interface().(error)
+
 	}
-
 	log.Logger().ErrorFX(ctx, "FuncName: %s Can not find in KisPool, Not Added.\n", fnName)
 
 	return errors.New("FuncName: " + fnName + " Can not find in NsPool, Not Added.")

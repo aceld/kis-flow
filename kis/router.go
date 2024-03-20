@@ -8,13 +8,10 @@ import (
 /*
 	Function Call
 */
-// FaaS Function as a Service
-type FaaS func(context.Context, Flow) error
-
 // funcRouter
 // key: Function Name
-// value: Function 回调自定义业务
-type funcRouter map[string]FaaS
+// value: FaaSDesc 回调自定义业务的描述
+type funcRouter map[string]*FaaSDesc
 
 // flowRouter
 // key: Flow Name
@@ -28,7 +25,7 @@ type flowRouter map[string]Flow
 type ConnInit func(conn Connector) error
 
 // connInitRouter
-//key:
+// key:
 type connInitRouter map[string]ConnInit
 
 /*
