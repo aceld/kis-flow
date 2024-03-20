@@ -113,10 +113,11 @@ func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow)
 			if argType.Kind() == reflect.Slice {
 				value, err := funcDesc.FaasSerialize.DecodeParam(flow.Input(), argType)
 				if err != nil {
-					return err
+					log.Logger().ErrorFX(ctx, "funcDesc.FaasSerialize.DecodeParam err=%v", err)
+				} else {
+					params = append(params, value)
+					continue
 				}
-				params = append(params, value)
-				continue
 			}
 			params = append(params, reflect.Zero(argType))
 		}

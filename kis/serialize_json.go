@@ -29,7 +29,7 @@ func (f DefaultFaasSerialize) DecodeParam(arr common.KisRowArr, r reflect.Type) 
 				// 如果还失败，则尝试先序列化为 JSON 再反序列化
 				elem, err = decodeJSON(row, r.Elem())
 				if err != nil {
-					return reflect.Value{}, fmt.Errorf("failed to decode row: %v", err)
+					return reflect.Value{}, fmt.Errorf("failed to decode row: %v  ", err)
 				}
 			}
 		}
@@ -62,19 +62,19 @@ func decodeString(row common.KisRow) (reflect.Value, error) {
 		}
 	}
 
-	return reflect.Value{}, fmt.Errorf("not a string")
+	return reflect.Value{}, fmt.Errorf("not a string  ")
 }
 
 // 尝试先序列化为 JSON 再反序列化
 func decodeJSON(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
 	jsonBytes, err := json.Marshal(row)
 	if err != nil {
-		return reflect.Value{}, fmt.Errorf("failed to marshal row to JSON: %v", err)
+		return reflect.Value{}, fmt.Errorf("failed to marshal row to JSON: %v  ", err)
 	}
 
 	elem := reflect.New(elemType).Interface()
 	if err := json.Unmarshal(jsonBytes, elem); err != nil {
-		return reflect.Value{}, fmt.Errorf("failed to unmarshal JSON to element: %v", err)
+		return reflect.Value{}, fmt.Errorf("failed to unmarshal JSON to element: %v  ", err)
 	}
 
 	return reflect.ValueOf(elem).Elem(), nil
@@ -90,7 +90,7 @@ func (f DefaultFaasSerialize) EncodeParam(i interface{}) (common.KisRowArr, erro
 			// 序列化每个元素为 JSON 字符串，并将其添加到切片中。
 			jsonBytes, err := json.Marshal(slice.Index(i).Interface())
 			if err != nil {
-				return nil, fmt.Errorf("failed to marshal element to JSON: %v", err)
+				return nil, fmt.Errorf("failed to marshal element to JSON: %v  ", err)
 			}
 			arr = append(arr, string(jsonBytes))
 		}
@@ -98,7 +98,7 @@ func (f DefaultFaasSerialize) EncodeParam(i interface{}) (common.KisRowArr, erro
 		// 如果不是切片或数组类型，则直接序列化整个结构体为 JSON 字符串。
 		jsonBytes, err := json.Marshal(i)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal element to JSON: %v", err)
+			return nil, fmt.Errorf("failed to marshal element to JSON: %v  ", err)
 		}
 		arr = append(arr, string(jsonBytes))
 	}
