@@ -12,7 +12,7 @@ func TestActionAbort(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/Aceld/go/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		fmt.Println("Wrong Config Yaml Path!")
 		panic(err)
 	}
@@ -35,7 +35,7 @@ func TestActionDataReuse(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/Aceld/go/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		fmt.Println("Wrong Config Yaml Path!")
 		panic(err)
 	}
@@ -58,7 +58,7 @@ func TestActionForceEntry(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/Aceld/go/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		fmt.Println("Wrong Config Yaml Path!")
 		panic(err)
 	}
@@ -81,7 +81,7 @@ func TestActionJumpFunc(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/Aceld/go/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		fmt.Println("Wrong Config Yaml Path!")
 		panic(err)
 	}

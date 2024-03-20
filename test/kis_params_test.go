@@ -11,7 +11,7 @@ func TestParams(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. 加载配置文件并构建Flow
-	if err := file.ConfigImportYaml("/Users/Aceld/go/src/kis-flow/test/load_conf/"); err != nil {
+	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		panic(err)
 	}
 
