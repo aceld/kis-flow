@@ -10,33 +10,40 @@ import (
 type DefaultFaasSerialize struct {
 }
 
+// DecodeParam 用于将 KisRowArr 反序列化为指定类型的值。
 func (f DefaultFaasSerialize) DecodeParam(arr common.KisRowArr, r reflect.Type) (reflect.Value, error) {
-	// 确保传入的类型是一个切片
+	// 确保传入的类型是一个切片。
 	if r.Kind() != reflect.Slice {
 		return reflect.Value{}, fmt.Errorf("r must be a slice")
 	}
+
+	// 创建一个新的切片，类型为传入的类型。
 	slice := reflect.MakeSlice(r, 0, len(arr))
+
+	// 遍历 KisRowArr 中的每个元素。
 	for _, row := range arr {
 		var elem reflect.Value
 		var err error
 
-		// 先尝试断言为结构体或指针
-		elem, err = decodeStruct(row, r.Elem())
-		if err != nil {
-			// 如果失败，则尝试直接反序列化为字符串
-			elem, err = decodeString(row)
-			if err != nil {
-				// 如果还失败，则尝试先序列化为 JSON 再反序列化
-				elem, err = decodeJSON(row, r.Elem())
-				if err != nil {
-					return reflect.Value{}, fmt.Errorf("failed to decode row: %v  ", err)
-				}
-			}
+		// 使用 switch 语句检查 row 的类型，然后调用相应的解码函数。
+		switch row := row.(type) {
+		case reflect.Value:
+			elem, err = decodeStruct(row, r.Elem())
+		case string:
+			elem, err = decodeString(row, r.Elem())
+		default:
+			elem, err = decodeJSON(row, r.Elem())
 		}
 
+		// 处理解码错误。
+		if err != nil {
+			return reflect.Value{}, fmt.Errorf("failed to decode row: %v", err)
+		}
+		// 将该值附加到新的切片中。
 		slice = reflect.Append(slice, elem)
 	}
 
+	// 返回最终的切片。
 	return slice, nil
 }
 
@@ -54,15 +61,21 @@ func decodeStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, erro
 }
 
 // 尝试直接反序列化字符串
-func decodeString(row common.KisRow) (reflect.Value, error) {
-	if str, ok := row.(string); ok {
-		var intValue int
-		if _, err := fmt.Sscanf(str, "%d", &intValue); err == nil {
-			return reflect.ValueOf(intValue), nil
-		}
+func decodeString(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+	str, ok := row.(string)
+	if !ok {
+		return reflect.Value{}, fmt.Errorf("not a string")
 	}
 
-	return reflect.Value{}, fmt.Errorf("not a string  ")
+	// 创建一个新的结构体实例，用于存储反序列化后的值。
+	elem := reflect.New(elemType).Elem()
+
+	// 尝试将字符串反序列化为结构体。
+	if err := json.Unmarshal([]byte(str), elem.Addr().Interface()); err != nil {
+		return reflect.Value{}, fmt.Errorf("failed to unmarshal string to struct: %v", err)
+	}
+
+	return elem, nil
 }
 
 // 尝试先序列化为 JSON 再反序列化
