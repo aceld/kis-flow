@@ -45,23 +45,22 @@ func TestAutoInjectParam(t *testing.T) {
 	}
 
 	// 3. 提交原始数据
-	_ = flow1.CommitRow(proto.StuScores{
-		StuId:  100,
-		Score1: 1,
-		Score2: 2,
-		Score3: 3,
+	_ = flow1.CommitRow(&faas.AvgStuScoreIn{
+		proto.StuScores{
+			StuId:  100,
+			Score1: 1,
+			Score2: 2,
+			Score3: 3,
+		},
 	})
-	_ = flow1.CommitRow(proto.StuScores{
-		StuId:  101,
-		Score1: 11,
-		Score2: 22,
-		Score3: 33,
-	})
-	_ = flow1.CommitRow(proto.StuScores{
-		StuId:  102,
-		Score1: 111,
-		Score2: 222,
-		Score3: 333,
+	_ = flow1.CommitRow(`{"stu_id":101}`)
+	_ = flow1.CommitRow(faas.AvgStuScoreIn{
+		proto.StuScores{
+			StuId:  100,
+			Score1: 1,
+			Score2: 2,
+			Score3: 3,
+		},
 	})
 
 	// 4. 执行flow1
