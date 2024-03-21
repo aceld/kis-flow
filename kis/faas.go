@@ -26,6 +26,9 @@ type FaaSDesc struct {
 var globalFaaSSerialize = &DefaultFaasSerialize{}
 
 func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
+
+	var serializeImpl FaasSerialize
+
 	funcValue := reflect.ValueOf(f)
 	funcType := funcValue.Type()
 
@@ -35,30 +38,41 @@ func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
 
 	argsType := make([]reflect.Type, funcType.NumIn())
 	fullName := runtime.FuncForPC(funcValue.Pointer()).Name()
-	containsKisflowCtx := false
+	containsKisFlow := false
+	containsCtx := false
 
 	for i := 0; i < funcType.NumIn(); i++ {
 		paramType := funcType.In(i)
 		if isFlowType(paramType) {
-			containsKisflowCtx = true
+			containsKisFlow = true
+		} else if isContextType(paramType) {
+			containsCtx = true
+		} else {
+			itemType := paramType.Elem()
+			// 如果切片元素是指针类型，则获取指针所指向的类型
+			if itemType.Kind() == reflect.Ptr {
+				itemType = itemType.Elem()
+			}
+			// Check if f implements FaasSerialize interface
+			if isFaasSerialize(itemType) {
+				serializeImpl = reflect.New(itemType).Interface().(FaasSerialize)
+			} else {
+				serializeImpl = globalFaaSSerialize // Use global default implementation
+			}
+
 		}
 		argsType[i] = paramType
 	}
 
-	if !containsKisflowCtx {
+	if !containsKisFlow {
 		return nil, errors.New("function parameters must have Kisflow context")
+	}
+	if !containsCtx {
+		return nil, errors.New("function parameters must have context")
 	}
 
 	if funcType.NumOut() != 1 || funcType.Out(0) != reflect.TypeOf((*error)(nil)).Elem() {
 		return nil, errors.New("function must have exactly one return value of type error")
-	}
-
-	// Check if f implements FaasSerialize interface
-	var serializeImpl FaasSerialize
-	if ser, ok := f.(FaasSerialize); ok {
-		serializeImpl = ser
-	} else {
-		serializeImpl = globalFaaSSerialize // Use global default implementation
 	}
 
 	return &FaaSDesc{
