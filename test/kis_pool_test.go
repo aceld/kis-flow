@@ -5,18 +5,12 @@ import (
 	"kis-flow/common"
 	"kis-flow/config"
 	"kis-flow/flow"
-	"kis-flow/kis"
-	"kis-flow/test/faas"
 	"testing"
 )
 
 func TestNewKisPool(t *testing.T) {
 
 	ctx := context.Background()
-
-	// 0. 注册Function
-	kis.Pool().FaaS("funcName1", faas.FuncDemo1Handler)
-	kis.Pool().FaaS("funcName2", faas.FuncDemo2Handler)
 
 	// 1. 创建2个KisFunction配置实例
 	source1 := config.KisSource{
@@ -34,9 +28,9 @@ func TestNewKisPool(t *testing.T) {
 		panic("myFuncConfig1 is nil")
 	}
 
-	myFuncConfig2 := config.NewFuncConfig("funcName2", common.E, &source2, nil)
+	myFuncConfig2 := config.NewFuncConfig("funcName4", common.E, &source2, nil)
 	if myFuncConfig2 == nil {
-		panic("myFuncConfig2 is nil")
+		panic("myFuncConfig4 is nil")
 	}
 
 	// 2. 创建一个 KisFlow 配置实例

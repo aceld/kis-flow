@@ -71,9 +71,9 @@ func TestNewKisFlowData(t *testing.T) {
 		panic("myFuncConfig1 is nil")
 	}
 
-	myFuncConfig2 := config.NewFuncConfig("funcName2", common.E, &source2, nil)
+	myFuncConfig2 := config.NewFuncConfig("funcName4", common.E, &source2, nil)
 	if myFuncConfig2 == nil {
-		panic("myFuncConfig2 is nil")
+		panic("myFuncConfig4 is nil")
 	}
 
 	// 2. 创建一个 KisFlow 配置实例
@@ -82,7 +82,7 @@ func TestNewKisFlowData(t *testing.T) {
 	// 3. 创建一个KisFlow对象
 	flow1 := flow.NewKisFlow(myFlowConfig1)
 
-	// 4. 拼接Functioin 到 Flow 上
+	// 4. 拼接 Function 到 Flow 上
 	if err := flow1.Link(myFuncConfig1, nil); err != nil {
 		panic(err)
 	}

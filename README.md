@@ -233,21 +233,18 @@ func FuncDemo1Handler(ctx context.Context, flow kis.Flow) error {
 // ... FuncDemo3Handler
 ```
 
+### 开发者
 
+* 刘丹冰([@aceld](https://github.com/aceld)) 
+* 胡辰豪([@ChenHaoHu](https://github.com/ChenHaoHu))
 
----
-### About the author
+  
+Thanks to all the developers who contributed to KisFlow!
 
-`name`：`Aceld(刘丹冰)`
+<a href="https://github.com/aceld/kis-flow/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=aceld/kis-flow" />
+</a>    
 
-`mail`:
-[danbing.at@gmail.com](mailto:danbing.at@gmail.com)
-
-`github`:
-[https://github.com/aceld](https://github.com/aceld)
-
-`original work`:
-[https://www.yuque.com/aceld](https://www.yuque.com/aceld)
 
 ### 加入KisFlow 社区
 
