@@ -3,17 +3,21 @@ package faas
 import (
 	"context"
 	"kis-flow/kis"
+	"kis-flow/serialize"
 	"kis-flow/test/proto"
 )
 
 type AvgStuScoreIn struct {
+	serialize.DefaultSerialize
 	proto.StuScores
 }
 
 type AvgStuScoreOut struct {
+	serialize.DefaultSerialize
 	proto.StuAvgScore
 }
 
+// AvgStuScore(FaaS) 计算学生平均分
 func AvgStuScore(ctx context.Context, flow kis.Flow, rows []*AvgStuScoreIn) error {
 	for _, row := range rows {
 		avgScore := proto.StuAvgScore{

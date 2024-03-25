@@ -4,7 +4,6 @@ import (
 	"context"
 	"kis-flow/common"
 	"kis-flow/config"
-	"reflect"
 	"time"
 )
 
@@ -49,10 +48,4 @@ type Flow interface {
 	GetFuncParamsAllFuncs() map[string]config.FParam
 	// Fork 得到Flow的一个副本(深拷贝)
 	Fork(ctx context.Context) Flow
-}
-
-var flowInterfaceType = reflect.TypeOf((*Flow)(nil)).Elem()
-
-func isFlowType(paramType reflect.Type) bool {
-	return paramType.Implements(flowInterfaceType)
 }

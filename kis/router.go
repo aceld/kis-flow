@@ -5,6 +5,8 @@ import (
 	"kis-flow/common"
 )
 
+// FaaS 定义移植到 faas.go 中
+
 /*
 	Function Call
 */

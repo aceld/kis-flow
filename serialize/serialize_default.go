@@ -1,4 +1,8 @@
-package kis
+/*
+	DefaultSerialize 实现了 Serialize 接口，用于将 KisRowArr 序列化为指定类型的值，或将指定类型的值序列化为 KisRowArr。
+    这部分是KisFlow默认提供的序列化办法，默认均是josn序列化，开发者可以根据自己的需求实现自己的序列化办法。
+*/
+package serialize
 
 import (
 	"encoding/json"
@@ -7,42 +11,50 @@ import (
 	"reflect"
 )
 
-type DefaultFaasSerialize struct {
-}
+type DefaultSerialize struct{}
 
-// DecodeParam 用于将 KisRowArr 反序列化为指定类型的值。
-func (f DefaultFaasSerialize) DecodeParam(arr common.KisRowArr, r reflect.Type) (reflect.Value, error) {
+// UnMarshal 用于将 KisRowArr 反序列化为指定类型的值。
+func (f *DefaultSerialize) UnMarshal(arr common.KisRowArr, r reflect.Type) (reflect.Value, error) {
 	// 确保传入的类型是一个切片
 	if r.Kind() != reflect.Slice {
 		return reflect.Value{}, fmt.Errorf("r must be a slice")
 	}
+
 	slice := reflect.MakeSlice(r, 0, len(arr))
+
+	// 遍历每个元素并尝试反序列化
 	for _, row := range arr {
 		var elem reflect.Value
 		var err error
 
-		// 先尝试断言为结构体或指针
-		elem, err = decodeStruct(row, r.Elem())
-		if err != nil {
-			// 如果失败，则尝试直接反序列化字符串
-			elem, err = decodeString(row, r.Elem())
-			if err != nil {
-				// 如果还失败，则尝试先序列化为 JSON 再反序列化
-				elem, err = decodeJSON(row, r.Elem())
-				if err != nil {
-					return reflect.Value{}, fmt.Errorf("failed to decode row: %v  ", err)
-				}
-			}
+		// 尝试断言为结构体或指针
+		elem, err = unMarshalStruct(row, r.Elem())
+		if err == nil {
+			slice = reflect.Append(slice, elem)
+			continue
 		}
 
-		slice = reflect.Append(slice, elem)
+		// 尝试直接反序列化字符串
+		elem, err = unMarshalJsonString(row, r.Elem())
+		if err == nil {
+			slice = reflect.Append(slice, elem)
+			continue
+		}
+
+		// 尝试先序列化为 JSON 再反序列化
+		elem, err = unMarshalJsonStruct(row, r.Elem())
+		if err == nil {
+			slice = reflect.Append(slice, elem)
+		} else {
+			return reflect.Value{}, fmt.Errorf("failed to decode row: %v", err)
+		}
 	}
 
 	return slice, nil
 }
 
 // 尝试断言为结构体或指针
-func decodeStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+func unMarshalStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
 	// 检查 row 是否为结构体或结构体指针类型
 	rowType := reflect.TypeOf(row)
 	if rowType == nil {
@@ -54,14 +66,19 @@ func decodeStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, erro
 
 	// 如果 row 是指针类型，则获取它指向的类型
 	if rowType.Kind() == reflect.Ptr {
+		// 空指针
 		if reflect.ValueOf(row).IsNil() {
 			return reflect.Value{}, fmt.Errorf("row is nil pointer")
 		}
-		row = reflect.ValueOf(row).Elem().Interface() // 解引用
+
+		// 解引用
+		row = reflect.ValueOf(row).Elem().Interface()
+
+		// 拿到解引用后的类型
 		rowType = reflect.TypeOf(row)
 	}
 
-	// 检查是否可以将 row 断言为 elemType
+	// 检查是否可以将 row 断言为 elemType(目标类型)
 	if !rowType.AssignableTo(elemType) {
 		return reflect.Value{}, fmt.Errorf("row type cannot be asserted to elemType")
 	}
@@ -70,17 +87,18 @@ func decodeStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, erro
 	return reflect.ValueOf(row), nil
 }
 
-// 尝试直接反序列化字符串
-func decodeString(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+// 尝试直接反序列化字符串(将Json字符串 反序列化为 结构体)
+func unMarshalJsonString(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+	// 判断源数据是否可以断言成string
 	str, ok := row.(string)
 	if !ok {
 		return reflect.Value{}, fmt.Errorf("not a string")
 	}
 
-	// 创建一个新的结构体实例，用于存储反序列化后的值。
+	// 创建一个新的结构体实例，用于存储反序列化后的值
 	elem := reflect.New(elemType).Elem()
 
-	// 尝试将字符串反序列化为结构体。
+	// 尝试将json字符串反序列化为结构体。
 	if err := json.Unmarshal([]byte(str), elem.Addr().Interface()); err != nil {
 		return reflect.Value{}, fmt.Errorf("failed to unmarshal string to struct: %v", err)
 	}
@@ -88,14 +106,18 @@ func decodeString(row common.KisRow, elemType reflect.Type) (reflect.Value, erro
 	return elem, nil
 }
 
-// 尝试先序列化为 JSON 再反序列化
-func decodeJSON(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+// 尝试先序列化为 JSON 再反序列化(将结构体转换成Json字符串，再将Json字符串 反序列化为 结构体)
+func unMarshalJsonStruct(row common.KisRow, elemType reflect.Type) (reflect.Value, error) {
+	// 将 row 序列化为 JSON 字符串
 	jsonBytes, err := json.Marshal(row)
 	if err != nil {
 		return reflect.Value{}, fmt.Errorf("failed to marshal row to JSON: %v  ", err)
 	}
 
+	// 创建一个新的结构体实例，用于存储反序列化后的值
 	elem := reflect.New(elemType).Interface()
+
+	// 将 JSON 字符串反序列化为结构体
 	if err := json.Unmarshal(jsonBytes, elem); err != nil {
 		return reflect.Value{}, fmt.Errorf("failed to unmarshal JSON to element: %v  ", err)
 	}
@@ -103,7 +125,8 @@ func decodeJSON(row common.KisRow, elemType reflect.Type) (reflect.Value, error)
 	return reflect.ValueOf(elem).Elem(), nil
 }
 
-func (f DefaultFaasSerialize) EncodeParam(i interface{}) (common.KisRowArr, error) {
+// Marshal 用于将指定类型的值序列化为 KisRowArr(json 序列化)。
+func (f *DefaultSerialize) Marshal(i interface{}) (common.KisRowArr, error) {
 	var arr common.KisRowArr
 
 	switch reflect.TypeOf(i).Kind() {
