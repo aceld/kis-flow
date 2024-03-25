@@ -1,0 +1,7 @@
+kistype: func
+fname: PrintStuAvgScore
+fmode: Expand
+source:
+    name: 学生平均分
+    must:
+        - stu_id
