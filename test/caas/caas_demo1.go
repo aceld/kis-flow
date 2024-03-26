@@ -3,7 +3,7 @@ package caas
 import (
 	"context"
 	"fmt"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/kis"
 )
 
 // type CaaS func(context.Context, Connector, Function, Flow, interface{}) error

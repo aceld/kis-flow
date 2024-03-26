@@ -3,10 +3,10 @@ package function
 import (
 	"context"
 	"errors"
-	"kis-flow/common"
-	"kis-flow/config"
-	"kis-flow/id"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/config"
+	"github.com/aceld/kis-flow/id"
+	"github.com/aceld/kis-flow/kis"
 	"sync"
 )
 

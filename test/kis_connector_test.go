@@ -2,9 +2,9 @@ package test
 
 import (
 	"context"
-	"kis-flow/common"
-	"kis-flow/config"
-	"kis-flow/flow"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/config"
+	"github.com/aceld/kis-flow/flow"
 	"testing"
 )
 

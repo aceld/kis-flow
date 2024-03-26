@@ -2,7 +2,7 @@ package caas
 
 import (
 	"fmt"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/kis"
 )
 
 // type ConnInit func(conn Connector) error

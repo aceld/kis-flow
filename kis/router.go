@@ -2,7 +2,7 @@ package kis
 
 import (
 	"context"
-	"kis-flow/common"
+	"github.com/aceld/kis-flow/common"
 )
 
 // FaaS 定义移植到 faas.go 中

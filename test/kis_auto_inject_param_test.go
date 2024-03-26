@@ -2,13 +2,13 @@ package test
 
 import (
 	"context"
-	"kis-flow/common"
-	"kis-flow/config"
-	"kis-flow/file"
-	"kis-flow/flow"
-	"kis-flow/kis"
-	"kis-flow/test/faas"
-	"kis-flow/test/proto"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/config"
+	"github.com/aceld/kis-flow/file"
+	"github.com/aceld/kis-flow/flow"
+	"github.com/aceld/kis-flow/kis"
+	"github.com/aceld/kis-flow/test/faas"
+	"github.com/aceld/kis-flow/test/proto"
 	"testing"
 )
 

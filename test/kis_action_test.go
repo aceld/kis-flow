@@ -3,8 +3,8 @@ package test
 import (
 	"context"
 	"fmt"
-	"kis-flow/file"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/file"
+	"github.com/aceld/kis-flow/kis"
 	"testing"
 )
 

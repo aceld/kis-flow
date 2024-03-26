@@ -3,8 +3,8 @@ package file
 import (
 	"errors"
 	"fmt"
-	"kis-flow/common"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/kis"
 	"os"
 
 	"gopkg.in/yaml.v3"

@@ -2,8 +2,8 @@ package kis
 
 import (
 	"context"
-	"kis-flow/common"
-	"kis-flow/config"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/config"
 	"time"
 )
 

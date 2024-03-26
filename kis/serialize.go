@@ -1,8 +1,8 @@
 package kis
 
 import (
-	"kis-flow/common"
-	"kis-flow/serialize"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/serialize"
 	"reflect"
 )
 

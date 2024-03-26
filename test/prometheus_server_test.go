@@ -1,7 +1,7 @@
 package test
 
 import (
-	"kis-flow/metrics"
+	"github.com/aceld/kis-flow/metrics"
 	"testing"
 )
 

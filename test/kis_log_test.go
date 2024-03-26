@@ -2,7 +2,7 @@ package test
 
 import (
 	"context"
-	"kis-flow/log"
+	"github.com/aceld/kis-flow/log"
 	"testing"
 )
 
