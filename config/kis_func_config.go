@@ -43,7 +43,10 @@ func NewFuncConfig(
 
 	if source == nil {
 		log.Logger().ErrorF("funcName NewConfig Error, source is nil, funcName = %s\n", funcName)
-		return nil
+		defaultSource := KisSource{
+			Name: "unNamedSource",
+		}
+		source = &defaultSource
 	}
 	config.Source = *source
 
