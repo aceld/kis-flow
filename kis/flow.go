@@ -14,6 +14,9 @@ type Flow interface {
 	Link(fConf *config.KisFuncConfig, fParams config.FParam) error
 	// CommitRow 提交Flow数据到即将执行的Function层
 	CommitRow(row interface{}) error
+	// CommitRowBatch 提交Flow数据到即将执行的Function层(批量提交)
+	// row: Must be a slice
+	CommitRowBatch(row interface{}) error
 	// Input 得到flow当前执行Function的输入源数据
 	Input() common.KisRowArr
 	// GetName 得到Flow的名称

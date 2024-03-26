@@ -9,6 +9,7 @@ import (
 	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
 	"github.com/patrickmn/go-cache"
+	"reflect"
 	"time"
 )
 
@@ -16,6 +17,21 @@ import (
 func (flow *KisFlow) CommitRow(row interface{}) error {
 
 	flow.buffer = append(flow.buffer, row)
+
+	return nil
+}
+
+// CommitRowBatch 提交Flow数据, 批量数据
+func (flow *KisFlow) CommitRowBatch(rows interface{}) error {
+	v := reflect.ValueOf(rows)
+	if v.Kind() != reflect.Slice {
+		return fmt.Errorf("Commit Data is not a slice")
+	}
+
+	for i := 0; i < v.Len(); i++ {
+		row := v.Index(i).Interface().(common.KisRow)
+		flow.buffer = append(flow.buffer, row)
+	}
 
 	return nil
 }
