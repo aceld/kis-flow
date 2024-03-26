@@ -20,7 +20,7 @@ func NewKisFunctionC() kis.Function {
 }
 
 func (f *KisFunctionC) Call(ctx context.Context, flow kis.Flow) error {
-	log.Logger().InfoF("KisFunctionC, flow = %+v\n", flow)
+	log.Logger().DebugF("KisFunctionC, flow = %+v\n", flow)
 
 	// 通过KisPool 路由到具体的执行计算Function中
 	if err := kis.Pool().CallFunction(ctx, f.Config.FName, flow); err != nil {
