@@ -1,4 +1,4 @@
-module kis-flow
+module github.com/aceld/kis-flow
 
 go 1.18
 

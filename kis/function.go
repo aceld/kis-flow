@@ -2,7 +2,7 @@ package kis
 
 import (
 	"context"
-	"kis-flow/config"
+	"github.com/aceld/kis-flow/config"
 )
 
 // Function 流式计算基础计算模块，KisFunction是一条流式计算的基本计算逻辑单元，

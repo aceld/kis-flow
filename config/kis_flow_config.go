@@ -1,6 +1,6 @@
 package config
 
-import "kis-flow/common"
+import "github.com/aceld/kis-flow/common"
 
 // KisFlowFunctionParam 一个Flow配置中Function的Id及携带固定配置参数
 type KisFlowFunctionParam struct {

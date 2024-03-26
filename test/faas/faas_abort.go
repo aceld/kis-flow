@@ -3,7 +3,7 @@ package faas
 import (
 	"context"
 	"fmt"
-	"kis-flow/kis"
+	"github.com/aceld/kis-flow/kis"
 )
 
 // type FaaS func(context.Context, Flow) error

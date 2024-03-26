@@ -3,9 +3,9 @@ package faas
 import (
 	"context"
 	"fmt"
-	"kis-flow/kis"
-	"kis-flow/serialize"
-	"kis-flow/test/proto"
+	"github.com/aceld/kis-flow/kis"
+	"github.com/aceld/kis-flow/serialize"
+	"github.com/aceld/kis-flow/test/proto"
 )
 
 type PrintStuAvgScoreIn struct {

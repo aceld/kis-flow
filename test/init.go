@@ -1,10 +1,10 @@
 package test
 
 import (
-	"kis-flow/common"
-	"kis-flow/kis"
-	"kis-flow/test/caas"
-	"kis-flow/test/faas"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/kis"
+	"github.com/aceld/kis-flow/test/caas"
+	"github.com/aceld/kis-flow/test/faas"
 )
 
 func init() {

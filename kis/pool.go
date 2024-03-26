@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kis-flow/common"
-	"kis-flow/log"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/log"
 	"reflect"
 	"sync"
 )

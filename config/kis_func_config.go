@@ -2,8 +2,8 @@ package config
 
 import (
 	"errors"
-	"kis-flow/common"
-	"kis-flow/log"
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/log"
 )
 
 // FParam 在当前Flow中Function定制固定配置参数类型

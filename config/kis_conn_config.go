@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"kis-flow/common"
+	"github.com/aceld/kis-flow/common"
 )
 
 // KisConnConfig KisConnector 策略配置

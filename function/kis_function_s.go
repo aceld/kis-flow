@@ -2,8 +2,8 @@ package function
 
 import (
 	"context"
-	"kis-flow/kis"
-	"kis-flow/log"
+	"github.com/aceld/kis-flow/kis"
+	"github.com/aceld/kis-flow/log"
 )
 
 type KisFunctionS struct {

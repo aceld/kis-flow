@@ -2,7 +2,7 @@ package kis
 
 import (
 	"context"
-	"kis-flow/config"
+	"github.com/aceld/kis-flow/config"
 )
 
 type Connector interface {

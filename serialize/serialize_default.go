@@ -7,7 +7,7 @@ package serialize
 import (
 	"encoding/json"
 	"fmt"
-	"kis-flow/common"
+	"github.com/aceld/kis-flow/common"
 	"reflect"
 )
 
