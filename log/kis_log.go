@@ -16,6 +16,9 @@ type KisLogger interface {
 	ErrorF(str string, v ...interface{})
 	// DebugF 无上下文的Debug级别日志接口, format字符串格式
 	DebugF(str string, v ...interface{})
+
+	// SetDebugMode 设置Debug模式
+	SetDebugMode(enable bool)
 }
 
 // kisLog 默认的KisLog 对象， 提供默认的日志打印方式, 均是打印在标准输出上。
