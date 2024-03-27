@@ -1,4 +1,4 @@
-<img width="770" alt="image" src="https://github.com/aceld/kis-flow/assets/7778936/0d907741-8909-465f-95e6-fa3671a4eb5e"># kis-flow
+# kis-flow
 
 
 #### KisFlow(Keep It Simple Flowing) 
