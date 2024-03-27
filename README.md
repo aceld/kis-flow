@@ -335,6 +335,12 @@ func main() {
 
 	return
 }
+
+func init() {
+	// Register functions
+	kis.Pool().FaaS("AvgStuScore", AvgStuScore)
+	kis.Pool().FaaS("PrintStuAvgScore", PrintStuAvgScore)
+}
 ```
 
 ### Function1
