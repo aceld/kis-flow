@@ -164,7 +164,7 @@ func buildFlow(all *allConfig, fp config.KisFlowFunctionParam, newFlow kis.Flow,
 		}
 
 		// flow add function
-		if err := newFlow.Link(funcConfig, fp.Params); err != nil {
+		if err := newFlow.AppendNewFunction(funcConfig, fp.Params); err != nil {
 			return err
 		}
 	}
