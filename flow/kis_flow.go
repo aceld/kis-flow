@@ -90,10 +90,10 @@ func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 	for _, fp := range flow.Conf.Flows {
 		if _, ok := flow.funcParams[flow.Funcs[fp.FuncName].GetId()]; !ok {
 			// 当前function没有配置Params
-			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), nil)
+			_ = newFlow.AppendNewFunction(flow.Funcs[fp.FuncName].GetConfig(), nil)
 		} else {
 			// 当前function有配置Params
-			newFlow.Link(flow.Funcs[fp.FuncName].GetConfig(), fp.Params)
+			_ = newFlow.AppendNewFunction(flow.Funcs[fp.FuncName].GetConfig(), fp.Params)
 		}
 	}
 
@@ -103,10 +103,26 @@ func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 	return newFlow
 }
 
-// Link 将Function链接到Flow中
+// Link 将Function链接到Flow中, 同时会将Function的配置参数添加到Flow的配置中
 // fConf: 当前Function策略
 // fParams: 当前Flow携带的Function动态参数
 func (flow *KisFlow) Link(fConf *config.KisFuncConfig, fParams config.FParam) error {
+
+	// Flow 添加Function
+	_ = flow.AppendNewFunction(fConf, fParams)
+
+	// FlowConfig 添加Function
+	flowFuncParam := config.KisFlowFunctionParam{
+		FuncName: fConf.FName,
+		Params:   fParams,
+	}
+	flow.Conf.AppendFunctionConfig(flowFuncParam)
+
+	return nil
+}
+
+// AppendNewFunction 将一个新的Function追加到到Flow中
+func (flow *KisFlow) AppendNewFunction(fConf *config.KisFuncConfig, fParams config.FParam) error {
 	// 创建Function实例
 	f := function.NewKisFunction(flow, fConf)
 

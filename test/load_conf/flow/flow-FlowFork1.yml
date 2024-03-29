@@ -1,0 +1,10 @@
+kistype: flow
+status: 1
+flow_name: flowFork1
+flows:
+  - fname: funcName1
+    params:
+      myKey1: flowValue1-1
+  - fname: funcName3
+    params:
+      myKey1: flowValue3-1
