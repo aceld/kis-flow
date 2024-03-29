@@ -100,7 +100,8 @@ func (pool *kisPool) FaaS(fnName string, f FaaS) {
 
 // CallFunction 调度 Function
 func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow) error {
-
+	pool.fnLock.RLock() // 读锁
+	defer pool.fnLock.RUnlock()
 	if funcDesc, ok := pool.fnRouter[fnName]; ok {
 
 		// 被调度Function的形参列表
