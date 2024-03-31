@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Discord](https://img.shields.io/badge/KisFlow-Discord-blue.svg)](https://discord.gg/xQ8Xxfyfcz)
 [![KisFlow-tutorial](https://img.shields.io/badge/KisFlowTutorial-YuQue-red.svg)](https://www.yuque.com/aceld/kis-flow) 
-[![KisFlow-Doc](https://img.shields.io/badge/KisFlow-Doc-black.svg)](https://www.yuque.com/aceld/kis-flow-doc)
+[![KisFlow-Doc](https://img.shields.io/badge/KisFlow-Doc-green.svg)](https://www.yuque.com/aceld/kis-flow-doc)
 
 
 #### KisFlow(Keep It Simple Flowing)
