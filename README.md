@@ -1,12 +1,18 @@
-# kis-flow
+# <img width="250px" src="https://github.com/aceld/kis-flow/assets/7778936/8729d750-897c-4ba3-98b4-c346188d034e" />
+
+[![License](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
+[![Discord](https://img.shields.io/badge/KisFlow-Discord-blue.svg)](https://discord.gg/xQ8Xxfyfcz)
+[![Gitter](https://img.shields.io/badge/KisFlow-Gitter-green.svg)](https://gitter.im/zinx_go/community) 
+[![KisFlow-tutorial](https://img.shields.io/badge/KisFlowTutorial-YuQue-red.svg)](https://www.yuque.com/aceld/kis-flow) 
+[![KisFlow-Doc](https://img.shields.io/badge/KisFlow-Doc-black.svg)](https://www.yuque.com/aceld/kis-flow-doc)
+
+
 
 #### KisFlow(Keep It Simple Flowing)
 
 基于Golang的流式计算框架. 为保持简单的流动，强调在进行各种活动或工作时保持简洁、清晰、流畅的过程。
 
 
-
----
 
 ## KisFlow源代码
 
@@ -20,16 +26,20 @@ Git: https://gitee.com/Aceld/kis-flow
 
 https://www.yuque.com/aceld/kis-flow-doc
 
-## KisFlow框架开发教程：《基于Golang的流式计算框架实战教程》
+## KisFlow框架开发教程
+
+*《基于Golang的流式计算框架实战教程》*
+
+<img width="350px" src="https://github.com/aceld/kis-flow/assets/7778936/173e3f5a-eac1-4b32-aa09-ef65053a5ef2" />
 
 https://www.yuque.com/aceld/hsa94o
 
 ## KisFlow系统定位
 
 KisFlow为业务上游计算层，上层接数仓/其他业务方ODS层、下游接本业务存储数据中心。<br />
-![yuque_diagram (2)](https://github.com/aceld/kis-flow/assets/7778936/b9e1957a-2d11-45d9-84c1-e92c9ac833cc)
 
-<a name="elhiR"></a>
+<img width="700px" src="https://github.com/aceld/kis-flow/assets/7778936/b9e1957a-2d11-45d9-84c1-e92c9ac833cc" />
+
 
 ## KisFlow整体架构图
 
@@ -59,7 +69,7 @@ https://github.com/aceld/kis-flow-usage
 
 #### 《KisFlow开发者文档》
 
-中文：https://www.yuque.com/aceld/kis-flow-doc
+https://www.yuque.com/aceld/kis-flow-doc
 
 #### 安装KisFlow
 
