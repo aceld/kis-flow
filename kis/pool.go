@@ -213,6 +213,8 @@ func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c Caa
 
 // CallConnector 调度 Connector
 func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connector, args interface{}) error {
+	pool.cLock.RLock() // 读锁
+	defer pool.cLock.RUnlock()
 	fn := flow.GetThisFunction()
 	fnConf := fn.GetConfig()
 	mode := common.KisMode(fnConf.FMode)
