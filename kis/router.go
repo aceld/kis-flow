@@ -34,7 +34,7 @@ type connInitRouter map[string]ConnInit
 	Connector Call
 */
 // CaaS Connector的存储读取业务实现
-type CaaS func(context.Context, Connector, Function, Flow, interface{}) error
+type CaaS func(context.Context, Connector, Function, Flow, interface{}) (interface{}, error)
 
 // connFuncRouter 通过FunctionName索引到CaaS回调存储业务的映射关系
 // key: Function Name

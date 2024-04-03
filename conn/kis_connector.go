@@ -50,12 +50,16 @@ func (conn *KisConnector) Init() error {
 }
 
 // Call 调用Connector 外挂存储逻辑的读写操作
-func (conn *KisConnector) Call(ctx context.Context, flow kis.Flow, args interface{}) error {
-	if err := kis.Pool().CallConnector(ctx, flow, conn, args); err != nil {
-		return err
+func (conn *KisConnector) Call(ctx context.Context, flow kis.Flow, args interface{}) (interface{}, error) {
+	var result interface{}
+	var err error
+
+	result, err = kis.Pool().CallConnector(ctx, flow, conn, args)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return result, nil
 }
 
 func (conn *KisConnector) GetName() string {

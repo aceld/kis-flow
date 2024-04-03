@@ -212,7 +212,7 @@ func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c Caa
 }
 
 // CallConnector 调度 Connector
-func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connector, args interface{}) error {
+func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connector, args interface{}) (interface{}, error) {
 	pool.cLock.RLock() // 读锁
 	defer pool.cLock.RUnlock()
 	fn := flow.GetThisFunction()
@@ -225,7 +225,7 @@ func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connecto
 
 	log.Logger().ErrorFX(ctx, "CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.\n", conn.GetName(), fnConf.FName, mode)
 
-	return errors.New(fmt.Sprintf("CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.", conn.GetName(), fnConf.FName, mode))
+	return nil, errors.New(fmt.Sprintf("CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.", conn.GetName(), fnConf.FName, mode))
 }
 
 // GetFlows 得到全部的Flow
