@@ -23,7 +23,7 @@ func FuncDemo2Handler(ctx context.Context, flow kis.Flow) error {
 			return err
 		}
 
-		if conn.Call(ctx, flow, row) != nil {
+		if _, err := conn.Call(ctx, flow, row); err != nil {
 			log.Logger().ErrorFX(ctx, "FuncDemo2Handler(): Call err = %s\n", err.Error())
 			return err
 		}
