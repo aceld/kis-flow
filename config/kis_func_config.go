@@ -52,16 +52,18 @@ func NewFuncConfig(
 
 	config.FMode = string(mode)
 
-	// FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
-	if mode == common.S || mode == common.L {
-		if option == nil {
-			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
-			return nil
-		} else if option.CName == "" {
-			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
-			return nil
+	/*
+		// FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
+		if mode == common.S || mode == common.L {
+			if option == nil {
+				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				return nil
+			} else if option.CName == "" {
+				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				return nil
+			}
 		}
-	}
+	*/
 
 	if option != nil {
 		config.Option = *option
