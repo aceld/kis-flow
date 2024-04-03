@@ -83,6 +83,9 @@ func (fConf *KisFuncConfig) AddConnConfig(cConf *KisConnConfig) error {
 	// Connector需要和Function进行关联
 	_ = cConf.WithFunc(fConf)
 
+	// 更新Function配置中的CName
+	fConf.Option.CName = cConf.CName
+
 	return nil
 }
 
