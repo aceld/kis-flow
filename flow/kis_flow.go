@@ -3,19 +3,19 @@ package flow
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"sync"
+	"time"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/conn"
 	"github.com/aceld/kis-flow/function"
 	"github.com/aceld/kis-flow/id"
 	"github.com/aceld/kis-flow/kis"
-	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
-	"github.com/prometheus/client_golang/prometheus"
-	"sync"
-	"time"
-
 	"github.com/patrickmn/go-cache"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // KisFlow 用于贯穿整条流式计算的上下文环境
@@ -97,8 +97,7 @@ func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 		}
 	}
 
-	log.Logger().DebugFX(ctx, "=====>Flow Fork, oldFlow.funcParams = %+v\n", flow.funcParams)
-	log.Logger().DebugFX(ctx, "=====>Flow Fork, newFlow.funcParams = %+v\n", newFlow.GetFuncParamsAllFuncs())
+	slog.DebugContext(ctx, "=====>Flow Fork", "oldFlow.funcParams", flow.funcParams, "newFlow.funcParams", newFlow.GetFuncParamsAllFuncs())
 
 	return newFlow
 }
@@ -257,7 +256,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 
 		// 得到当前Function要处理与的源数据
 		if inputData, err := flow.getCurData(); err != nil {
-			log.Logger().ErrorFX(ctx, "flow.Run(): getCurData err = %s\n", err.Error())
+			slog.ErrorContext(ctx, "flow.Run(): getCurData ", "err", err.Error())
 			return err
 		} else {
 			flow.inPut = inputData
@@ -346,7 +345,7 @@ func (flow *KisFlow) GetFuncConfigByName(funcName string) *config.KisFuncConfig 
 	if f, ok := flow.Funcs[funcName]; ok {
 		return f.GetConfig()
 	} else {
-		log.Logger().ErrorF("GetFuncConfigByName(): Function %s not found", funcName)
+		slog.Error("GetFuncConfigByName Function not found", "functionName", funcName)
 		return nil
 	}
 }

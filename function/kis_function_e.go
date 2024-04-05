@@ -3,7 +3,7 @@ package function
 import (
 	"context"
 	"github.com/aceld/kis-flow/kis"
-	"github.com/aceld/kis-flow/log"
+	"log/slog"
 )
 
 type KisFunctionE struct {
@@ -20,11 +20,11 @@ func NewKisFunctionE() kis.Function {
 }
 
 func (f *KisFunctionE) Call(ctx context.Context, flow kis.Flow) error {
-	log.Logger().DebugF("KisFunctionE, flow = %+v\n", flow)
+	slog.Debug("KisFunctionE", "flow", flow)
 
 	// 通过KisPool 路由到具体的执行计算Function中
 	if err := kis.Pool().CallFunction(ctx, f.Config.FName, flow); err != nil {
-		log.Logger().ErrorFX(ctx, "Function Called Error err = %s\n", err)
+		slog.ErrorContext(ctx, "Function Called Error", "err", err)
 		return err
 	}
 

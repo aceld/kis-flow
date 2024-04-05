@@ -1,14 +1,15 @@
 /*
-	DefaultSerialize 实现了 Serialize 接口，用于将 KisRowArr 序列化为指定类型的值，或将指定类型的值序列化为 KisRowArr。
-    这部分是KisFlow默认提供的序列化办法，默认均是josn序列化，开发者可以根据自己的需求实现自己的序列化办法。
+		DefaultSerialize 实现了 Serialize 接口，用于将 KisRowArr 序列化为指定类型的值，或将指定类型的值序列化为 KisRowArr。
+	    这部分是KisFlow默认提供的序列化办法，默认均是josn序列化，开发者可以根据自己的需求实现自己的序列化办法。
 */
 package serialize
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aceld/kis-flow/common"
 	"reflect"
+
+	"github.com/aceld/kis-flow/common"
 )
 
 type DefaultSerialize struct{}

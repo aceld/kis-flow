@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/kis"
-	"github.com/aceld/kis-flow/log"
+	"log/slog"
 	"testing"
 )
 
@@ -27,7 +27,7 @@ func TestForkFlowCommitBatch(t *testing.T) {
 
 	// 3. 提交原始数据
 	if err := flow1.CommitRowBatch(stringRows); err != nil {
-		log.Logger().ErrorF("CommitRowBatch Error, err = %+v", err)
+		slog.Error("CommitRowBatch Error", "err", err)
 		panic(err)
 	}
 
