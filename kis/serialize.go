@@ -1,9 +1,10 @@
 package kis
 
 import (
+	"reflect"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/serialize"
-	"reflect"
 )
 
 // Serialize 数据序列化接口

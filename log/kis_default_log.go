@@ -1,67 +1,66 @@
 package log
 
 import (
-	"context"
-	"fmt"
-	"sync"
+	"io"
+	"log/slog"
+	"os"
 )
 
-// kisDefaultLog 默认提供的日志对象
-type kisDefaultLog struct {
-	debugMode bool
-	mu        sync.Mutex
+// KisDefaultLog 默认提供的日志对象
+type KisDefaultLog struct {
+	location   bool
+	level      slog.Level
+	jsonFormat bool
+	writer     io.Writer
 }
 
-func (log *kisDefaultLog) SetDebugMode(enable bool) {
-	log.mu.Lock()
-	defer log.mu.Unlock()
-	log.debugMode = enable
-}
+type KisLogOptions func(k *KisDefaultLog)
 
-func (log *kisDefaultLog) InfoF(str string, v ...interface{}) {
-	fmt.Printf(str, v...)
-	fmt.Printf("\n")
-}
-
-func (log *kisDefaultLog) ErrorF(str string, v ...interface{}) {
-	fmt.Printf(str, v...)
-	fmt.Printf("\n")
-}
-
-func (log *kisDefaultLog) DebugF(str string, v ...interface{}) {
-	log.mu.Lock()
-	defer log.mu.Unlock()
-	if log.debugMode {
-		fmt.Printf(str, v...)
-		fmt.Printf("\n")
+func WithLocation(location bool) KisLogOptions {
+	return func(k *KisDefaultLog) {
+		k.location = location
 	}
 }
 
-func (log *kisDefaultLog) InfoFX(ctx context.Context, str string, v ...interface{}) {
-	fmt.Println(ctx)
-	fmt.Printf(str, v...)
-	fmt.Printf("\n")
-}
-
-func (log *kisDefaultLog) ErrorFX(ctx context.Context, str string, v ...interface{}) {
-	fmt.Println(ctx)
-	fmt.Printf(str, v...)
-	fmt.Printf("\n")
-}
-
-func (log *kisDefaultLog) DebugFX(ctx context.Context, str string, v ...interface{}) {
-	log.mu.Lock()
-	defer log.mu.Unlock()
-	if log.debugMode {
-		fmt.Println(ctx)
-		fmt.Printf(str, v...)
-		fmt.Printf("\n")
+func WithLevel(level slog.Level) KisLogOptions {
+	return func(k *KisDefaultLog) {
+		k.level = level
 	}
 }
 
-func init() {
-	// 如果没有设置Logger, 则启动时使用默认的kisDefaultLog对象
-	if Logger() == nil {
-		SetLogger(&kisDefaultLog{})
+func WithJSONFormat(jsonFormat bool) KisLogOptions {
+	return func(k *KisDefaultLog) {
+		k.jsonFormat = jsonFormat
 	}
+}
+
+func WithWriter(writer io.Writer) KisLogOptions {
+	return func(k *KisDefaultLog) {
+		k.writer = writer
+	}
+}
+
+var defaultKisLog = &KisDefaultLog{
+	location:   true,
+	level:      slog.LevelDebug,
+	jsonFormat: false,
+	writer:     os.Stdout,
+}
+
+func loadKisDefaultLog(opts ...KisLogOptions) *KisDefaultLog {
+	kisLog := defaultKisLog
+	if opts == nil {
+		return kisLog
+	}
+
+	for _, opt := range opts {
+		opt(kisLog)
+	}
+
+	return kisLog
+}
+
+// MustNewLog 初始化日志
+func MustNewLog(opts ...KisLogOptions) {
+	SetLogger(loadKisDefaultLog(opts...))
 }

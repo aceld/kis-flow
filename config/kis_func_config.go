@@ -2,8 +2,9 @@ package config
 
 import (
 	"errors"
+	"log/slog"
+
 	"github.com/aceld/kis-flow/common"
-	"github.com/aceld/kis-flow/log"
 )
 
 // FParam 在当前Flow中Function定制固定配置参数类型
@@ -46,7 +47,7 @@ func NewFuncConfig(
 			Name: "unNamedSource",
 		}
 		source = &defaultSource
-		log.Logger().InfoF("funcName NewConfig source is nil, funcName = %s, use default unNamed Source.", funcName)
+		slog.Debug("funcName NewConfig source is nil, use default unNamed Source.", "funcName", funcName)
 	}
 	config.Source = *source
 
@@ -55,10 +56,10 @@ func NewFuncConfig(
 	// FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
 	if mode == common.S || mode == common.L {
 		if option == nil {
-			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+			slog.Error("Funcion S/L need option->Cid")
 			return nil
 		} else if option.CName == "" {
-			log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+			slog.Error("Funcion S/L need option->Cid")
 			return nil
 		}
 	}

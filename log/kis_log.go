@@ -1,35 +1,33 @@
 package log
 
-import "context"
+import (
+	"log/slog"
+	"path/filepath"
+)
 
-type KisLogger interface {
-	// InfoFX 有上下文的Info级别日志接口, format字符串格式
-	InfoFX(ctx context.Context, str string, v ...interface{})
-	// ErrorFX 有上下文的Error级别日志接口, format字符串格式
-	ErrorFX(ctx context.Context, str string, v ...interface{})
-	// DebugFX 有上下文的Debug级别日志接口, format字符串格式
-	DebugFX(ctx context.Context, str string, v ...interface{})
+// SetLogger 替换 slog
+func SetLogger(kisLog *KisDefaultLog) {
+	replace := func(groups []string, a slog.Attr) slog.Attr {
+		if a.Key == slog.SourceKey {
+			source := a.Value.Any().(*slog.Source)
+			source.Function = ""
+			source.File = filepath.Base(source.File)
+		}
 
-	// InfoF 无上下文的Info级别日志接口, format字符串格式
-	InfoF(str string, v ...interface{})
-	// ErrorF 无上下文的Error级别日志接口, format字符串格式
-	ErrorF(str string, v ...interface{})
-	// DebugF 无上下文的Debug级别日志接口, format字符串格式
-	DebugF(str string, v ...interface{})
+		return a
+	}
 
-	// SetDebugMode 设置Debug模式
-	SetDebugMode(enable bool)
-}
+	ho := &slog.HandlerOptions{
+		AddSource:   kisLog.location,
+		Level:       kisLog.level,
+		ReplaceAttr: replace,
+	}
 
-// kisLog 默认的KisLog 对象， 提供默认的日志打印方式, 均是打印在标准输出上。
-var kisLog KisLogger
-
-// SetLogger 设置KisLog对象, 可以是用户自定义的Logger对象
-func SetLogger(newlog KisLogger) {
-	kisLog = newlog
-}
-
-// Logger 获取到kisLog对象
-func Logger() KisLogger {
-	return kisLog
+	var logger *slog.Logger
+	if kisLog.jsonFormat {
+		logger = slog.New(slog.NewJSONHandler(kisLog.writer, ho))
+	} else {
+		logger = slog.New(slog.NewTextHandler(kisLog.writer, ho))
+	}
+	slog.SetDefault(logger)
 }
