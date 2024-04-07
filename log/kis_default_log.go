@@ -17,8 +17,8 @@ func init() {
 }
 
 func MustNewKisDefaultSlog(opts ...KisLogOptions) {
-	initDefaultSlog(loadKisDefaultLog(opts...))
-	SetLogger(&kisDefaultSlog{})
+	defaultSlog := getKisDefaultSLog(opts...)
+	SetLogger(defaultSlog)
 }
 
 // kisDefaultSlog 默认提供的日志对象
@@ -64,17 +64,18 @@ var defaultKisLog = &kisDefaultSlog{
 	writer:     os.Stdout,
 }
 
-func loadKisDefaultLog(opts ...KisLogOptions) *kisDefaultSlog {
-	kisLog := defaultKisLog
+func getKisDefaultSLog(opts ...KisLogOptions) *kisDefaultSlog {
+	defaultKisSlog := defaultKisLog
 	if opts == nil {
-		return kisLog
+		return defaultKisSlog
 	}
 
 	for _, opt := range opts {
-		opt(kisLog)
+		opt(defaultKisSlog)
 	}
 
-	return kisLog
+	initDefaultSlog(defaultKisSlog)
+	return defaultKisSlog
 }
 
 func (k *kisDefaultSlog) InfoFX(ctx context.Context, str string, v ...interface{}) {
