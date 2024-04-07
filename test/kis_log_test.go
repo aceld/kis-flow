@@ -9,11 +9,11 @@ import (
 func TestKisLogger(t *testing.T) {
 	ctx := context.Background()
 
-	log.Logger().InfoFX(ctx, "TestKisLogger InfoFX")
-	log.Logger().ErrorFX(ctx, "TestKisLogger ErrorFX")
-	log.Logger().DebugFX(ctx, "TestKisLogger DebugFX")
+	log.Logger().InfoX(ctx, "TestKisLogger InfoX")
+	log.Logger().ErrorX(ctx, "TestKisLogger ErrorX")
+	log.Logger().DebugX(ctx, "TestKisLogger DebugX")
 
-	log.Logger().InfoF("TestKisLogger InfoF")
-	log.Logger().ErrorF("TestKisLogger ErrorF")
-	log.Logger().DebugF("TestKisLogger DebugF")
+	log.Logger().Info("TestKisLogger Info")
+	log.Logger().Error("TestKisLogger Error")
+	log.Logger().Debug("TestKisLogger Debug")
 }

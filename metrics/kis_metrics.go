@@ -36,7 +36,7 @@ func RunMetricsService(serverAddr string) error {
 	// 启动HttpServer
 	err := http.ListenAndServe(serverAddr, nil) // 多个进程不可监听同一个端口
 	if err != nil {
-		log.Logger().ErrorF("RunMetricsService", "err", err)
+		log.Logger().Error("RunMetricsService", "err", err)
 	}
 
 	return err

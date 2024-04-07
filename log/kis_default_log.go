@@ -78,27 +78,27 @@ func getKisDefaultSLog(opts ...KisLogOptions) *kisDefaultSlog {
 	return defaultKisSlog
 }
 
-func (k *kisDefaultSlog) InfoFX(ctx context.Context, str string, v ...interface{}) {
+func (k *kisDefaultSlog) InfoX(ctx context.Context, str string, v ...interface{}) {
 	slog.InfoContext(ctx, str, v...)
 }
 
-func (k *kisDefaultSlog) ErrorFX(ctx context.Context, str string, v ...interface{}) {
+func (k *kisDefaultSlog) ErrorX(ctx context.Context, str string, v ...interface{}) {
 	slog.ErrorContext(ctx, str, v...)
 }
 
-func (k *kisDefaultSlog) DebugFX(ctx context.Context, str string, v ...interface{}) {
+func (k *kisDefaultSlog) DebugX(ctx context.Context, str string, v ...interface{}) {
 	slog.DebugContext(ctx, str, v...)
 }
 
-func (k *kisDefaultSlog) InfoF(str string, v ...interface{}) {
+func (k *kisDefaultSlog) Info(str string, v ...interface{}) {
 	slog.Info(str, v...)
 }
 
-func (k *kisDefaultSlog) ErrorF(str string, v ...interface{}) {
+func (k *kisDefaultSlog) Error(str string, v ...interface{}) {
 	slog.Error(str, v...)
 }
 
-func (k *kisDefaultSlog) DebugF(str string, v ...interface{}) {
+func (k *kisDefaultSlog) Debug(str string, v ...interface{}) {
 	slog.Debug(str, v...)
 }
 

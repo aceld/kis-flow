@@ -73,7 +73,7 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 		metrics.Metrics.FlowDataTotal.WithLabelValues(flow.Name).Add(float64(dataCnt))
 	}
 
-	log.Logger().DebugFX(ctx, "====> After CommitSrcData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
+	log.Logger().DebugX(ctx, "====> After CommitSrcData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
@@ -106,7 +106,7 @@ func (flow *KisFlow) commitReuseData(ctx context.Context) error {
 	// 清空缓冲Buf (如果是ReuseData选项，那么提交的全部数据，都将不会携带到下一层)
 	flow.buffer = flow.buffer[0:0]
 
-	log.Logger().DebugFX(ctx, " ====> After commitReuseData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitReuseData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
@@ -122,7 +122,7 @@ func (flow *KisFlow) commitVoidData(ctx context.Context) error {
 	// 将本层计算的缓冲数据提交到本层结果数据中
 	flow.data[flow.ThisFunctionId] = batch
 
-	log.Logger().DebugFX(ctx, " ====> After commitVoidData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitVoidData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
@@ -150,7 +150,7 @@ func (flow *KisFlow) commitCurData(ctx context.Context) error {
 	// 清空缓冲Buf
 	flow.buffer = flow.buffer[0:0]
 
-	log.Logger().DebugFX(ctx, " ====> After commitCurData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitCurData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
