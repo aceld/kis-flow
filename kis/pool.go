@@ -33,7 +33,7 @@ var _pool *kisPool
 // Pool 单例构造
 func Pool() *kisPool {
 	_poolOnce.Do(func() {
-		//创建kisPool对象
+		// 创建kisPool对象
 		_pool = new(kisPool)
 
 		// fnRouter初始化
@@ -61,7 +61,7 @@ func (pool *kisPool) AddFlow(name string, flow Flow) {
 		panic(errString)
 	}
 
-	log.Logger().InfoF("Add FlowRouter FlowName=%s", name)
+	log.Logger().InfoF("Add FlowRouter", "FlowName", name)
 }
 
 func (pool *kisPool) GetFlow(name string) Flow {
@@ -95,7 +95,7 @@ func (pool *kisPool) FaaS(fnName string, f FaaS) {
 		panic(errString)
 	}
 
-	log.Logger().InfoF("Add KisPool FuncName=%s", fnName)
+	log.Logger().InfoF("Add KisPool", "FuncName", fnName)
 }
 
 // CallFunction 调度 Function
@@ -127,7 +127,7 @@ func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow)
 				// 将flow.Input()中的原始数据，反序列化为argType类型的数据
 				value, err := funcDesc.Serialize.UnMarshal(flow.Input(), argType)
 				if err != nil {
-					log.Logger().ErrorFX(ctx, "funcDesc.Serialize.DecodeParam err=%v", err)
+					log.Logger().ErrorFX(ctx, "funcDesc.Serialize.DecodeParam", "err", err)
 				} else {
 					params = append(params, value)
 					continue
@@ -153,7 +153,7 @@ func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow)
 
 	}
 
-	log.Logger().ErrorFX(ctx, "FuncName: %s Can not find in KisPool, Not Added.\n", fnName)
+	log.Logger().ErrorFX(ctx, "FuncName: Can not find in KisPool, Not Added.", "FuncName", fnName)
 
 	return errors.New("FuncName: " + fnName + " Can not find in NsPool, Not Added.")
 }
@@ -170,7 +170,7 @@ func (pool *kisPool) CaaSInit(cname string, c ConnInit) {
 		panic(errString)
 	}
 
-	log.Logger().InfoF("Add KisPool CaaSInit CName=%s", cname)
+	log.Logger().InfoF("Add KisPool CaaSInit", "CName", cname)
 }
 
 // CallConnInit 调度 ConnInit
@@ -193,10 +193,10 @@ func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c Caa
 	defer pool.cLock.Unlock()
 
 	if _, ok := pool.cTree[cname]; !ok {
-		//cid 首次注册，不存在，创建二级树NsConnSL
+		// cid 首次注册，不存在，创建二级树NsConnSL
 		pool.cTree[cname] = make(connSL)
 
-		//初始化各类型FunctionMode
+		// 初始化各类型FunctionMode
 		pool.cTree[cname][common.S] = make(connFuncRouter)
 		pool.cTree[cname][common.L] = make(connFuncRouter)
 	}
@@ -208,7 +208,7 @@ func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c Caa
 		panic(errString)
 	}
 
-	log.Logger().InfoF("Add KisPool CaaS CName=%s, FName=%s, Mode =%s", cname, fname, mode)
+	log.Logger().InfoF("Add KisPool CaaS", "CName", cname, "FName", fname, "Mode", mode)
 }
 
 // CallConnector 调度 Connector
@@ -223,7 +223,7 @@ func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connecto
 		return callback(ctx, conn, fn, flow, args)
 	}
 
-	log.Logger().ErrorFX(ctx, "CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.\n", conn.GetName(), fnConf.FName, mode)
+	log.Logger().ErrorFX(ctx, "Can not find in KisPool, Not Added.", "CName", conn.GetName(), " FName", fnConf.FName, "mode", mode)
 
 	return nil, errors.New(fmt.Sprintf("CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.", conn.GetName(), fnConf.FName, mode))
 }

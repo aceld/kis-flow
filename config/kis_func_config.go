@@ -46,7 +46,7 @@ func NewFuncConfig(
 			Name: "unNamedSource",
 		}
 		source = &defaultSource
-		log.Logger().InfoF("funcName NewConfig source is nil, funcName = %s, use default unNamed Source.", funcName)
+		log.Logger().InfoF("funcName NewConfig source is nil, use default unNamed Source.", "funcName", funcName)
 	}
 	config.Source = *source
 
