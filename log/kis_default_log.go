@@ -78,27 +78,27 @@ func loadKisDefaultLog(opts ...KisLogOptions) *kisDefaultSlog {
 }
 
 func (k *kisDefaultSlog) InfoFX(ctx context.Context, str string, v ...interface{}) {
-	slog.InfoContext(ctx, str, v)
+	slog.InfoContext(ctx, str, v...)
 }
 
 func (k *kisDefaultSlog) ErrorFX(ctx context.Context, str string, v ...interface{}) {
-	slog.ErrorContext(ctx, str, v)
+	slog.ErrorContext(ctx, str, v...)
 }
 
 func (k *kisDefaultSlog) DebugFX(ctx context.Context, str string, v ...interface{}) {
-	slog.DebugContext(ctx, str, v)
+	slog.DebugContext(ctx, str, v...)
 }
 
 func (k *kisDefaultSlog) InfoF(str string, v ...interface{}) {
-	slog.Info(str, v)
+	slog.Info(str, v...)
 }
 
 func (k *kisDefaultSlog) ErrorF(str string, v ...interface{}) {
-	slog.Error(str, v)
+	slog.Error(str, v...)
 }
 
 func (k *kisDefaultSlog) DebugF(str string, v ...interface{}) {
-	slog.Debug(str, v)
+	slog.Debug(str, v...)
 }
 
 func (k *kisDefaultSlog) SetDebugMode(enable bool) {
