@@ -18,6 +18,7 @@ func init() {
 
 func MustNewKisDefaultSlog(opts ...KisLogOptions) {
 	defaultSlog := getKisDefaultSLog(opts...)
+	initDefaultSlog(defaultSlog)
 	SetLogger(defaultSlog)
 }
 
@@ -74,7 +75,6 @@ func getKisDefaultSLog(opts ...KisLogOptions) *kisDefaultSlog {
 		opt(defaultKisSlog)
 	}
 
-	initDefaultSlog(defaultKisSlog)
 	return defaultKisSlog
 }
 
@@ -102,13 +102,10 @@ func (k *kisDefaultSlog) DebugF(str string, v ...interface{}) {
 	slog.Debug(str, v...)
 }
 
-func (k *kisDefaultSlog) SetDebugMode(enable bool) {
+func (k *kisDefaultSlog) SetDebugMode() {
 	k.mu.Lock()
 	defer k.mu.Unlock()
-
-	if enable {
-		k.level = slog.LevelDebug
-	}
+	k.level = slog.LevelDebug
 }
 
 func initDefaultSlog(kisLog *kisDefaultSlog) {

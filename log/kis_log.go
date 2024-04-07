@@ -18,7 +18,7 @@ type KisLogger interface {
 	DebugF(str string, v ...interface{})
 
 	// SetDebugMode 设置Debug模式
-	SetDebugMode(enable bool)
+	SetDebugMode()
 }
 
 // kisLog 默认的KisLog 对象， 提供默认的日志打印方式, 均是打印在标准输出上。
