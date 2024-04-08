@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -76,6 +77,31 @@ func getKisDefaultSLog(opts ...KisLogOptions) *kisDefaultSlog {
 	}
 
 	return defaultKisSlog
+}
+
+func (k *kisDefaultSlog) InfoFX(ctx context.Context, str string, v ...interface{}) {
+	slog.InfoContext(ctx, fmt.Sprintf(str, v...))
+}
+
+func (k *kisDefaultSlog) ErrorFX(ctx context.Context, str string, v ...interface{}) {
+	slog.ErrorContext(ctx, fmt.Sprintf(str, v...))
+}
+
+func (k *kisDefaultSlog) DebugFX(ctx context.Context, str string, v ...interface{}) {
+	slog.DebugContext(ctx, fmt.Sprintf(str, v...))
+}
+
+// InfoF 使用格式化格式（xxxF或xxxFX）要使用 fmt.Sprintf() 函数进行格式化包装
+func (k *kisDefaultSlog) InfoF(str string, v ...interface{}) {
+	slog.Info(fmt.Sprintf(str, v...))
+}
+
+func (k *kisDefaultSlog) ErrorF(str string, v ...interface{}) {
+	slog.Error(fmt.Sprintf(str, v...))
+}
+
+func (k *kisDefaultSlog) DebugF(str string, v ...interface{}) {
+	slog.Debug(fmt.Sprintf(str, v...))
 }
 
 func (k *kisDefaultSlog) InfoX(ctx context.Context, str string, v ...interface{}) {
