@@ -69,11 +69,11 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 		// 统计数据总量 Metrics.DataTota 指标累计加1
 		metrics.Metrics.DataTotal.Add(float64(dataCnt))
 
-		//统计当前Flow数量指标
+		// 统计当前Flow数量指标
 		metrics.Metrics.FlowDataTotal.WithLabelValues(flow.Name).Add(float64(dataCnt))
 	}
 
-	log.Logger().DebugFX(ctx, "====> After CommitSrcData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+	log.Logger().DebugX(ctx, "====> After CommitSrcData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
@@ -106,7 +106,7 @@ func (flow *KisFlow) commitReuseData(ctx context.Context) error {
 	// 清空缓冲Buf (如果是ReuseData选项，那么提交的全部数据，都将不会携带到下一层)
 	flow.buffer = flow.buffer[0:0]
 
-	log.Logger().DebugFX(ctx, " ====> After commitReuseData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitReuseData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
@@ -122,12 +122,12 @@ func (flow *KisFlow) commitVoidData(ctx context.Context) error {
 	// 将本层计算的缓冲数据提交到本层结果数据中
 	flow.data[flow.ThisFunctionId] = batch
 
-	log.Logger().DebugFX(ctx, " ====> After commitVoidData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitVoidData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }
 
-//commitCurData 提交Flow当前执行Function的结果数据
+// commitCurData 提交Flow当前执行Function的结果数据
 func (flow *KisFlow) commitCurData(ctx context.Context) error {
 
 	// 判断本层计算是否有结果数据,如果没有则退出本次Flow Run循环
@@ -150,7 +150,7 @@ func (flow *KisFlow) commitCurData(ctx context.Context) error {
 	// 清空缓冲Buf
 	flow.buffer = flow.buffer[0:0]
 
-	log.Logger().DebugFX(ctx, " ====> After commitCurData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
+	log.Logger().DebugX(ctx, " ====> After commitCurData", "flow_name", flow.Name, "flow_id", flow.Id, "All Level Data", flow.data)
 
 	return nil
 }

@@ -26,7 +26,7 @@ func TestNewFuncConfig(t *testing.T) {
 
 	myFunc1 := config.NewFuncConfig("funcName1", common.S, &source, &option)
 
-	log.Logger().InfoF("funcName1: %+v\n", myFunc1)
+	log.Logger().Info("funcName1", myFunc1)
 }
 
 func TestNewFlowConfig(t *testing.T) {
@@ -50,7 +50,7 @@ func TestNewFlowConfig(t *testing.T) {
 	myFlow1.AppendFunctionConfig(flowFuncParams1)
 	myFlow1.AppendFunctionConfig(flowFuncParams2)
 
-	log.Logger().InfoF("myFlow1: %+v\n", myFlow1)
+	log.Logger().Info("myFlow1", myFlow1)
 }
 
 func TestNewConnConfig(t *testing.T) {
@@ -81,8 +81,8 @@ func TestNewConnConfig(t *testing.T) {
 	myConnector1 := config.NewConnConfig("connectorName1", "0.0.0.0:9987,0.0.0.0:9997", common.REDIS, "key", connParams)
 
 	if err := myConnector1.WithFunc(myFunc1); err != nil {
-		log.Logger().ErrorF("WithFunc err: %s\n", err.Error())
+		log.Logger().Error("WithFunc", "err", err.Error())
 	}
 
-	log.Logger().InfoF("myConnector1: %+v\n", myConnector1)
+	log.Logger().Info("myConnector1", myConnector1)
 }

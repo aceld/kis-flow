@@ -46,7 +46,7 @@ func NewFuncConfig(
 			Name: "unNamedSource",
 		}
 		source = &defaultSource
-		log.Logger().InfoF("funcName NewConfig source is nil, funcName = %s, use default unNamed Source.", funcName)
+		log.Logger().Info("funcName NewConfig source is nil, use default unNamed Source.", "funcName", funcName)
 	}
 	config.Source = *source
 
@@ -56,10 +56,10 @@ func NewFuncConfig(
 		// FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
 		if mode == common.S || mode == common.L {
 			if option == nil {
-				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				log.Logger().Error("Funcion S/L need option->Cid\n")
 				return nil
 			} else if option.CName == "" {
-				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				log.Logger().Error("Funcion S/L need option->Cid\n")
 				return nil
 			}
 		}

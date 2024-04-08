@@ -27,7 +27,7 @@ func TestForkFlowCommitBatch(t *testing.T) {
 
 	// 3. 提交原始数据
 	if err := flow1.CommitRowBatch(stringRows); err != nil {
-		log.Logger().ErrorF("CommitRowBatch Error, err = %+v", err)
+		log.Logger().Error("CommitRowBatch Error", "err", err)
 		panic(err)
 	}
 
