@@ -13,7 +13,7 @@ type KisFunctionV struct {
 func NewKisFunctionV() kis.Function {
 	f := new(KisFunctionV)
 
-	// 初始化metaData
+	// Initialize metaData
 	f.metaData = make(map[string]interface{})
 
 	return f
@@ -22,7 +22,7 @@ func NewKisFunctionV() kis.Function {
 func (f *KisFunctionV) Call(ctx context.Context, flow kis.Flow) error {
 	log.Logger().DebugF("KisFunctionV, flow = %+v\n", flow)
 
-	// 通过KisPool 路由到具体的执行计算Function中
+	// Route to the specific computing Function through KisPool
 	if err := kis.Pool().CallFunction(ctx, f.Config.FName, flow); err != nil {
 		log.Logger().ErrorFX(ctx, "Function Called Error err = %s\n", err)
 		return err

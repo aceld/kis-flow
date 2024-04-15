@@ -13,7 +13,7 @@ func FuncDemo3Handler(ctx context.Context, flow kis.Flow) error {
 	fmt.Printf("Params = %+v\n", flow.GetFuncParamAll())
 
 	for _, row := range flow.Input() {
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
+		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetID(), row)
 		fmt.Println(str)
 	}
 

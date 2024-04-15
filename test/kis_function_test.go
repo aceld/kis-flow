@@ -12,9 +12,9 @@ import (
 func TestNewKisFunction(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. 创建一个KisFunction配置实例
+	// 1. Create a KisFunction configuration instance
 	source := config.KisSource{
-		Name: "公众号抖音商城户订单数据",
+		Name: "TikTokOrder",
 		Must: []string{"order_id", "user_id"},
 	}
 
@@ -23,13 +23,13 @@ func TestNewKisFunction(t *testing.T) {
 		panic("myFuncConfig1 is nil")
 	}
 
-	// 2. 创建一个 KisFlow 配置实例
+	// 2. Create a KisFlow configuration instance
 	myFlowConfig1 := config.NewFlowConfig("flowName1", common.FlowEnable)
 
-	// 3. 创建一个KisFlow对象
+	// 3. Create a KisFlow object
 	flow1 := flow.NewKisFlow(myFlowConfig1)
 
-	// 4. 创建一个KisFunction对象
+	// 4. Create a KisFunction object
 	func1 := function.NewKisFunction(flow1, myFuncConfig1)
 
 	if err := func1.Call(ctx, flow1); err != nil {

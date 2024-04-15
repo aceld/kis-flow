@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// CommitRow 提交Flow数据, 一行数据，如果是批量数据可以提交多次
+// CommitRow submits a single row of data to the Flow; multiple rows can be submitted multiple times
 func (flow *KisFlow) CommitRow(row interface{}) error {
 
 	flow.buffer = append(flow.buffer, row)
@@ -21,7 +21,7 @@ func (flow *KisFlow) CommitRow(row interface{}) error {
 	return nil
 }
 
-// CommitRowBatch 提交Flow数据, 批量数据
+// CommitRowBatch submits a batch of data to the Flow
 func (flow *KisFlow) CommitRowBatch(rows interface{}) error {
 	v := reflect.ValueOf(rows)
 	if v.Kind() != reflect.Slice {
@@ -36,17 +36,17 @@ func (flow *KisFlow) CommitRowBatch(rows interface{}) error {
 	return nil
 }
 
-// Input 得到flow当前执行Function的输入源数据
+// Input gets the input data for the currently executing Function in the Flow
 func (flow *KisFlow) Input() common.KisRowArr {
 	return flow.inPut
 }
 
-// commitSrcData 提交当前Flow的数据源数据, 表示首次提交当前Flow的原始数据源
-// 将flow的临时数据buffer，提交到flow的data中,(data为各个Function层级的源数据备份)
-// 会清空之前所有的flow数据
+// commitSrcData submits the data source data for the current Flow, indicating the first submission of the original data source for the current Flow
+// The flow's temporary data buffer is submitted to the flow's data (data is the source data backup for each Function level)
+// All previous flow data will be cleared
 func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 
-	// 制作批量数据batch
+	// Create a batch of data
 	dataCnt := len(flow.buffer)
 	batch := make(common.KisRowArr, 0, dataCnt)
 
@@ -54,22 +54,22 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 		batch = append(batch, row)
 	}
 
-	// 清空之前所有数据
+	// Clear all previous data
 	flow.clearData(flow.data)
 
-	// 首次提交，记录flow原始数据
-	// 因为首次提交，所以PrevFunctionId为FirstVirtual 因为没有上一层Function
-	flow.data[common.FunctionIdFirstVirtual] = batch
+	// Record the original data for the flow for the first time
+	// Because it is the first submission, PrevFunctionId is FirstVirtual because there is no upper Function
+	flow.data[common.FunctionIDFirstVirtual] = batch
 
-	// 清空缓冲Buf
+	// Clear the buffer
 	flow.buffer = flow.buffer[0:0]
 
-	// 首次提交数据源数据，进行统计数据总量
+	// The first submission of data source data, for statistical total data
 	if config.GlobalConfig.EnableProm == true {
-		// 统计数据总量 Metrics.DataTota 指标累计加1
+		// Statistics for total data Metrics.DataTotal accumulates by 1
 		metrics.Metrics.DataTotal.Add(float64(dataCnt))
 
-		//统计当前Flow数量指标
+		// Statistics for current Flow quantity index
 		metrics.Metrics.FlowDataTotal.WithLabelValues(flow.Name).Add(float64(dataCnt))
 	}
 
@@ -78,7 +78,7 @@ func (flow *KisFlow) commitSrcData(ctx context.Context) error {
 	return nil
 }
 
-// getCurData 获取flow当前Function层级的输入数据
+// getCurData gets the input data for the current Function level of the flow
 func (flow *KisFlow) getCurData() (common.KisRowArr, error) {
 	if flow.PrevFunctionId == "" {
 		return nil, errors.New(fmt.Sprintf("flow.PrevFunctionId is not set"))
@@ -94,16 +94,16 @@ func (flow *KisFlow) getCurData() (common.KisRowArr, error) {
 // commitReuseData
 func (flow *KisFlow) commitReuseData(ctx context.Context) error {
 
-	// 判断上层是否有结果数据, 如果没有则退出本次Flow Run循环
+	// Check if there are result data from the upper layer; if not, exit the current Flow Run loop
 	if len(flow.data[flow.PrevFunctionId]) == 0 {
 		flow.abort = true
 		return nil
 	}
 
-	// 本层结果数据等于上层结果数据(复用上层结果数据到本层)
+	// This layer's result data is equal to the upper layer's result data (reuse the upper layer's result data to this layer)
 	flow.data[flow.ThisFunctionId] = flow.data[flow.PrevFunctionId]
 
-	// 清空缓冲Buf (如果是ReuseData选项，那么提交的全部数据，都将不会携带到下一层)
+	// Clear the buffer (If it is a ReuseData option, all the submitted data will not be carried to the next layer)
 	flow.buffer = flow.buffer[0:0]
 
 	log.Logger().DebugFX(ctx, " ====> After commitReuseData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
@@ -116,10 +116,10 @@ func (flow *KisFlow) commitVoidData(ctx context.Context) error {
 		return nil
 	}
 
-	// 制作空数据
+	// Create empty data
 	batch := make(common.KisRowArr, 0)
 
-	// 将本层计算的缓冲数据提交到本层结果数据中
+	// Submit the calculated buffer data of this layer to the result data of this layer
 	flow.data[flow.ThisFunctionId] = batch
 
 	log.Logger().DebugFX(ctx, " ====> After commitVoidData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
@@ -127,27 +127,27 @@ func (flow *KisFlow) commitVoidData(ctx context.Context) error {
 	return nil
 }
 
-//commitCurData 提交Flow当前执行Function的结果数据
+// commitCurData submits the result data of the currently executing Function in the Flow
 func (flow *KisFlow) commitCurData(ctx context.Context) error {
 
-	// 判断本层计算是否有结果数据,如果没有则退出本次Flow Run循环
+	// Check if this layer's calculation has result data; if not, exit the current Flow Run loop
 	if len(flow.buffer) == 0 {
 		flow.abort = true
 		return nil
 	}
 
-	// 制作批量数据batch
+	// Create a batch of data
 	batch := make(common.KisRowArr, 0, len(flow.buffer))
 
-	// 如果strBuf为空，则没有添加任何数据
+	// If strBuf is empty, no data has been added
 	for _, row := range flow.buffer {
 		batch = append(batch, row)
 	}
 
-	// 将本层计算的缓冲数据提交到本层结果数据中
+	// Submit the calculated buffer data of this layer to the result data of this layer
 	flow.data[flow.ThisFunctionId] = batch
 
-	// 清空缓冲Buf
+	// Clear the buffer
 	flow.buffer = flow.buffer[0:0]
 
 	log.Logger().DebugFX(ctx, " ====> After commitCurData, flow_name = %s, flow_id = %s\nAll Level Data =\n %+v\n", flow.Name, flow.Id, flow.data)
@@ -155,7 +155,7 @@ func (flow *KisFlow) commitCurData(ctx context.Context) error {
 	return nil
 }
 
-// clearData 清空flow所有数据
+// clearData clears all flow data
 func (flow *KisFlow) clearData(data common.KisDataMap) {
 	for k := range data {
 		delete(data, k)
@@ -179,7 +179,7 @@ func (flow *KisFlow) SetCacheData(key string, value interface{}, Exp time.Durati
 	}
 }
 
-// GetMetaData 得到当前Flow对象的临时数据
+// GetMetaData gets the temporary data of the current Flow object
 func (flow *KisFlow) GetMetaData(key string) interface{} {
 	flow.mLock.RLock()
 	defer flow.mLock.RUnlock()
@@ -192,7 +192,7 @@ func (flow *KisFlow) GetMetaData(key string) interface{} {
 	return data
 }
 
-// SetMetaData 设置当前Flow对象的临时数据
+// SetMetaData sets the temporary data of the current Flow object
 func (flow *KisFlow) SetMetaData(key string, value interface{}) {
 	flow.mLock.Lock()
 	defer flow.mLock.Unlock()
@@ -200,7 +200,7 @@ func (flow *KisFlow) SetMetaData(key string, value interface{}) {
 	flow.metaData[key] = value
 }
 
-// GetFuncParam 得到Flow的当前正在执行的Function的配置默认参数，取出一对key-value
+// GetFuncParam gets the default configuration parameters of the currently executing Function in the Flow, retrieves a key-value pair
 func (flow *KisFlow) GetFuncParam(key string) string {
 	flow.fplock.RLock()
 	defer flow.fplock.RUnlock()
@@ -214,7 +214,7 @@ func (flow *KisFlow) GetFuncParam(key string) string {
 	return ""
 }
 
-// GetFuncParamAll 得到Flow的当前正在执行的Function的配置默认参数，取出全部Key-Value
+// GetFuncParamAll gets the default configuration parameters of the currently executing Function in the Flow, retrieves all Key-Value pairs
 func (flow *KisFlow) GetFuncParamAll() config.FParam {
 	flow.fplock.RLock()
 	defer flow.fplock.RUnlock()
@@ -227,7 +227,7 @@ func (flow *KisFlow) GetFuncParamAll() config.FParam {
 	return param
 }
 
-// GetFuncParamsAllFuncs 得到Flow中所有Function的FuncParams，取出全部Key-Value
+// GetFuncParamsAllFuncs gets the FuncParams of all Functions in the Flow, retrieves all Key-Value pairs
 func (flow *KisFlow) GetFuncParamsAllFuncs() map[string]config.FParam {
 	flow.fplock.RLock()
 	defer flow.fplock.RUnlock()

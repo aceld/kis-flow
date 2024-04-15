@@ -12,7 +12,7 @@ func NoResultFuncHandler(ctx context.Context, flow kis.Flow) error {
 	fmt.Println("---> Call NoResultFuncHandler ----")
 
 	for _, row := range flow.Input() {
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
+		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetID(), row)
 		fmt.Println(str)
 	}
 

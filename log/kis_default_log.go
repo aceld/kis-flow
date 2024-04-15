@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// kisDefaultLog 默认提供的日志对象
+// kisDefaultLog Default provided log object
 type kisDefaultLog struct {
 	debugMode bool
 	mu        sync.Mutex
@@ -60,7 +60,7 @@ func (log *kisDefaultLog) DebugFX(ctx context.Context, str string, v ...interfac
 }
 
 func init() {
-	// 如果没有设置Logger, 则启动时使用默认的kisDefaultLog对象
+	// If no logger is set, use the default kisDefaultLog object at startup
 	if Logger() == nil {
 		SetLogger(&kisDefaultLog{})
 	}

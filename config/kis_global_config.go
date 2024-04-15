@@ -1,15 +1,16 @@
 package config
 
+// KisGlobalConfig represents the global configuration for KisFlow
 type KisGlobalConfig struct {
-	//kistype Global为kisflow的全局配置
+	// KisType Global is the global configuration for kisflow
 	KisType string `yaml:"kistype"`
-	//是否启动prometheus监控
+	// EnableProm indicates whether to start Prometheus monitoring
 	EnableProm bool `yaml:"prometheus_enable"`
-	//是否需要kisflow单独启动端口监听
+	// PrometheusListen indicates whether kisflow needs to start a separate port for listening
 	PrometheusListen bool `yaml:"prometheus_listen"`
-	//prometheus取点监听地址
+	// PrometheusServe is the address for Prometheus scraping
 	PrometheusServe string `yaml:"prometheus_serve"`
 }
 
-// GlobalConfig 默认全局配置，全部均为关闭
+// GlobalConfig is the default global configuration, all are set to off
 var GlobalConfig = new(KisGlobalConfig)

@@ -1,25 +1,27 @@
 package kis
 
-// Action KisFlow执行流程Actions
+// Action defines the actions for KisFlow execution.
 type Action struct {
-	// DataReuse 是否复用上层Function数据
+	// DataReuse indicates whether to reuse data from the upper Function.
 	DataReuse bool
 
-	// 默认Next()为如果本层Function计算结果为0条数据，之后Function将不会继续执行
-	// ForceEntryNext 为忽略上述默认规则，没有数据强制进入下一层Function
+	// ForceEntryNext overrides the default rule, where if the current Function's calculation result is 0 data entries,
+	// subsequent Functions will not continue execution.
+	// With ForceEntryNext set to true, the next Function will be entered regardless of the data.
 	ForceEntryNext bool
 
-	// JumpFunc 跳转到指定Function继续执行
+	// JumpFunc specifies the Function to jump to for continued execution.
+	// (Note: This can easily lead to Flow loop calls, causing an infinite loop.)
 	JumpFunc string
 
-	// Abort 终止Flow的执行
+	// Abort terminates the execution of the Flow.
 	Abort bool
 }
 
-// ActionFunc KisFlow Functional Option 类型
+// ActionFunc is the type for KisFlow Functional Option.
 type ActionFunc func(ops *Action)
 
-// LoadActions 加载Actions，依次执行ActionFunc操作函数
+// LoadActions loads Actions and sequentially executes the ActionFunc operations.
 func LoadActions(acts []ActionFunc) Action {
 	action := Action{}
 
@@ -34,25 +36,25 @@ func LoadActions(acts []ActionFunc) Action {
 	return action
 }
 
-// ActionDataReuse Next复用上层Function数据Option
+// ActionDataReuse sets the option for reusing data from the upper Function.
 func ActionDataReuse(act *Action) {
 	act.DataReuse = true
 }
 
-// ActionForceEntryNext 强制进入下一层
+// ActionForceEntryNext sets the option to forcefully enter the next layer.
 func ActionForceEntryNext(act *Action) {
 	act.ForceEntryNext = true
 }
 
-// ActionJumpFunc 会返回一个ActionFunc函数，并且会将funcName赋值给Action.JumpFunc
-// (注意：容易出现Flow循环调用，导致死循环)
+// ActionJumpFunc returns an ActionFunc function and sets the funcName to Action.JumpFunc.
+// (Note: This can easily lead to Flow loop calls, causing an infinite loop.)
 func ActionJumpFunc(funcName string) ActionFunc {
 	return func(act *Action) {
 		act.JumpFunc = funcName
 	}
 }
 
-// ActionAbort 终止Flow的执行
+// ActionAbort terminates the execution of the Flow.
 func ActionAbort(action *Action) {
 	action.Abort = true
 }
