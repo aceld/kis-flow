@@ -17,8 +17,22 @@ type KisLogger interface {
 	// DebugF 无上下文的Debug级别日志接口, format字符串格式
 	DebugF(str string, v ...interface{})
 
+	// InfoX 有上下文的Info级别日志接口, format字符串格式
+	InfoX(ctx context.Context, str string, v ...interface{})
+	// ErrorX 有上下文的Error级别日志接口, format字符串格式
+	ErrorX(ctx context.Context, str string, v ...interface{})
+	// DebugX 有上下文的Debug级别日志接口, format字符串格式
+	DebugX(ctx context.Context, str string, v ...interface{})
+
+	// Info 无上下文的Info级别日志接口, format字符串格式
+	Info(str string, v ...interface{})
+	// Error 无上下文的Error级别日志接口, format字符串格式
+	Error(str string, v ...interface{})
+	// Debug 无上下文的Debug级别日志接口, format字符串格式
+	Debug(str string, v ...interface{})
+
 	// SetDebugMode 设置Debug模式
-	SetDebugMode(enable bool)
+	SetDebugMode()
 }
 
 // kisLog 默认的KisLog 对象， 提供默认的日志打印方式, 均是打印在标准输出上。

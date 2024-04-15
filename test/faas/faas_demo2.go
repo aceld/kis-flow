@@ -19,12 +19,12 @@ func FuncDemo2Handler(ctx context.Context, flow kis.Flow) error {
 
 		conn, err := flow.GetConnector()
 		if err != nil {
-			log.Logger().ErrorFX(ctx, "FuncDemo2Handler(): GetConnector err = %s\n", err.Error())
+			log.Logger().ErrorX(ctx, "FuncDemo2Handler(): GetConnector", "err", err.Error())
 			return err
 		}
 
 		if _, err := conn.Call(ctx, flow, row); err != nil {
-			log.Logger().ErrorFX(ctx, "FuncDemo2Handler(): Call err = %s\n", err.Error())
+			log.Logger().ErrorX(ctx, "FuncDemo2Handler(): Call", "err", err.Error())
 			return err
 		}
 

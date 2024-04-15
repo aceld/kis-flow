@@ -34,9 +34,9 @@ func RunMetricsService(serverAddr string) error {
 	http.Handle(common.METRICS_ROUTE, promhttp.Handler())
 
 	// 启动HttpServer
-	err := http.ListenAndServe(serverAddr, nil) //多个进程不可监听同一个端口
+	err := http.ListenAndServe(serverAddr, nil) // 多个进程不可监听同一个端口
 	if err != nil {
-		log.Logger().ErrorF("RunMetricsService err = %s\n", err)
+		log.Logger().Error("RunMetricsService", "err", err)
 	}
 
 	return err
@@ -67,7 +67,7 @@ func InitMetrics() {
 			Name: common.GANGE_FLOW_SCHE_CNTS_NAME,
 			Help: common.GANGE_FLOW_SCHE_CNTS_HELP,
 		},
-		//标签名称
+		// 标签名称
 		[]string{common.LABEL_FLOW_NAME},
 	)
 
@@ -77,7 +77,7 @@ func InitMetrics() {
 			Name: common.GANGE_FUNC_SCHE_CNTS_NAME,
 			Help: common.GANGE_FUNC_SCHE_CNTS_HELP,
 		},
-		//标签名称
+		// 标签名称
 		[]string{common.LABEL_FUNCTION_NAME, common.LABEL_FUNCTION_MODE},
 	)
 
@@ -85,7 +85,7 @@ func InitMetrics() {
 	Metrics.FunctionDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    common.HISTOGRAM_FUNCTION_DURATION_NAME,
 		Help:    common.HISTOGRAM_FUNCTION_DURATION_HELP,
-		Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000}, //单位ms,最大半分钟
+		Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000}, // 单位ms,最大半分钟
 	},
 		[]string{common.LABEL_FUNCTION_NAME, common.LABEL_FUNCTION_MODE},
 	)
@@ -95,7 +95,7 @@ func InitMetrics() {
 		prometheus.HistogramOpts{
 			Name:    common.HISTOGRAM_FLOW_DURATION_NAME,
 			Help:    common.HISTOGRAM_FLOW_DURATION_HELP,
-			Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000, 60000}, //单位ms,最大1分钟
+			Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000, 60000}, // 单位ms,最大1分钟
 		},
 		[]string{common.LABEL_FLOW_NAME},
 	)
