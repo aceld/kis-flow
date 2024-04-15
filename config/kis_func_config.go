@@ -1,7 +1,8 @@
 package config
 
 import (
-	"errors"
+	"fmt"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/log"
 )
@@ -75,7 +76,7 @@ func NewFuncConfig(
 // AddConnConfig WithConn binds Function to Connector
 func (fConf *KisFuncConfig) AddConnConfig(cConf *KisConnConfig) error {
 	if cConf == nil {
-		return errors.New("KisConnConfig is nil")
+		return fmt.Errorf("KisConnConfig is nil")
 	}
 
 	// Function needs to be associated with Connector
@@ -93,7 +94,7 @@ func (fConf *KisFuncConfig) AddConnConfig(cConf *KisConnConfig) error {
 // GetConnConfig gets the Connector configuration
 func (fConf *KisFuncConfig) GetConnConfig() (*KisConnConfig, error) {
 	if fConf.connConf == nil {
-		return nil, errors.New("KisFuncConfig.connConf not set")
+		return nil, fmt.Errorf("KisFuncConfig.connConf not set")
 	}
 
 	return fConf.connConf, nil

@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+	"time"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
 	"github.com/patrickmn/go-cache"
-	"reflect"
-	"time"
 )
 
 // CommitRow submits a single row of data to the Flow; multiple rows can be submitted multiple times
