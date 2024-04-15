@@ -6,7 +6,7 @@ import (
 	"github.com/aceld/kis-flow/kis"
 )
 
-// type CaaS func(context.Context, Connector, Function, Flow, interface{}) error
+// type CaaS func(context.Context, Connector, Function, Flow, interface{}) (interface{}, error)
 
 func CaasDemoHanler1(ctx context.Context, conn kis.Connector, fn kis.Function, flow kis.Flow, args interface{}) (interface{}, error) {
 	fmt.Printf("===> In CaasDemoHanler1: flowName: %s, cName:%s, fnName:%s, mode:%s\n",

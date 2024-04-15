@@ -53,4 +53,6 @@ type Flow interface {
 	GetFuncParamsAllFuncs() map[string]config.FParam
 	// Fork 得到Flow的一个副本(深拷贝)
 	Fork(ctx context.Context) Flow
+	// GetId 得到Flow的Id
+	GetId() string
 }
