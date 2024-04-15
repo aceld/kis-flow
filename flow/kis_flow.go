@@ -311,6 +311,10 @@ func (flow *KisFlow) GetName() string {
 	return flow.Name
 }
 
+func (flow *KisFlow) GetId() string {
+	return flow.Id
+}
+
 func (flow *KisFlow) GetThisFunction() kis.Function {
 	return flow.ThisFunction
 }
