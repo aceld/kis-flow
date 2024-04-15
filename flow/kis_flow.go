@@ -97,8 +97,8 @@ func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 		}
 	}
 
-	log.Logger().DebugX(ctx, "=====>Flow Fork, ", "oldFlow.funcParams", flow.funcParams)
-	log.Logger().DebugX(ctx, "=====>Flow Fork, ", "newFlow.funcParams", newFlow.GetFuncParamsAllFuncs())
+	log.Logger().DebugFX(ctx, "=====>Flow Fork, oldFlow.funcParams = %+v\n", flow.funcParams)
+	log.Logger().DebugFX(ctx, "=====>Flow Fork, newFlow.funcParams = %+v\n", newFlow.GetFuncParamsAllFuncs())
 
 	return newFlow
 }
@@ -257,7 +257,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 
 		// 得到当前Function要处理与的源数据
 		if inputData, err := flow.getCurData(); err != nil {
-			log.Logger().ErrorX(ctx, "flow.Run(): getCurData", "err", err.Error())
+			log.Logger().ErrorFX(ctx, "flow.Run(): getCurData err = %s\n", err.Error())
 			return err
 		} else {
 			flow.inPut = inputData
@@ -350,7 +350,7 @@ func (flow *KisFlow) GetFuncConfigByName(funcName string) *config.KisFuncConfig 
 	if f, ok := flow.Funcs[funcName]; ok {
 		return f.GetConfig()
 	} else {
-		log.Logger().Error("GetFuncConfigByName(): Function not found", "FunctionName", funcName)
+		log.Logger().ErrorF("GetFuncConfigByName(): Function %s not found", funcName)
 		return nil
 	}
 }
