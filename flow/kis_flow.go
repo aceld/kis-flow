@@ -16,7 +16,7 @@ import (
 	"github.com/aceld/kis-flow/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 )
 
 // KisFlow is used to manage the context environment of the entire streaming computation.
