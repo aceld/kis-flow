@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aceld/kis-flow/common"
-	"github.com/aceld/kis-flow/log"
 	"reflect"
 	"sync"
+
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/log"
 )
 
 var _poolOnce sync.Once
