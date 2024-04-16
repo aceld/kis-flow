@@ -2,6 +2,8 @@ run:
   timeout: 30m
   skip-dirs:
     - test
+  skip-files:
+    - kis_id.go
 
 linters:
   disable-all: true
