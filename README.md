@@ -42,8 +42,7 @@ Git: https://gitee.com/Aceld/kis-flow
 
 KisFlow serves as the upstream computing layer for business, connecting to the ODS layer of data warehouses or other business methods upstream, and connecting to the data center of this business's storage downstream. <br />
 
-
-<img width="700px" src="https://github.com/aceld/kis-flow/assets/7778936/b9e1957a-2d11-45d9-84c1-e92c9ac833cc" />
+<img width="700px" src="https://github.com/aceld/kis-flow/assets/7778936/c7db6df0-fcec-4b4d-94b9-4aba71cd55c3" />
 
 
 ## KisFlow Overall Architecture Diagram
@@ -54,10 +53,11 @@ KisFlow serves as the upstream computing layer for business, connecting to the O
 | Flowing Computation Layer | The upstream computing layer for KisFlow, which directly connects to business storage and the ODS (Operational Data Store) layer of data warehouses. The upstream can be MySQL Binlog, logs, interface data, etc., and it supports a passive consumption mode, providing KisFlow with real-time computing capabilities. | **KisFlow**: Distributed batch consumer; a KisFlow is composed of multiple KisFunctions. <br /><br />**KisConnectors**: Computing data stream intermediate state persistence and connectors. <br /><br />**KisFunctions**: Supports operator expression splicing, connector integration, strategy configuration, Stateful Function mode, and Slink stream splicing. <br /><br />**KisConfig**: Binding of flow processing policies for KisFunctions, allowing Functions to have fixed independent processing capabilities. <br /><br />**KisSource**: Interface for connecting to ODS data sources. |
 | Task Scheduling Layer | Timed task scheduling and execution business logic, including task scheduling platform, executor management, scheduling logs, and user management. Provides KisFlow's timed task, statistics, and aggregation calculation capabilities.  | **The task scheduling platform has a visual interface.**：ncludes running reports, scheduling reports, success rate, task management, configuration management, and GLUE IDE as visual management platforms. <br /><br /> **Executor management KisJobs**: Golang SDK, custom business logic, executor automatic registration, task triggering, termination, and removal.<br /><br /> **Executor scenarios KisScenes**: Logical task sets divided according to business needs.<br /><br /> **Scheduling logs and user management**: Collection of task scheduling logs, detailed scheduling, and scheduling process traces.                                                                              |
 
+![KisFlow](https://github.com/aceld/kis-flow/assets/7778936/59dceaf3-16e7-41fc-979f-98297638416f)
 
-![KisFlow架构图drawio](https://github.com/aceld/kis-flow/assets/7778936/3b829bdb-600d-4ab9-9e62-e14f90737cc3)
 
-![KisFlow架构设计-KisFlow整体结构 drawio](https://github.com/aceld/kis-flow/assets/7778936/efc1b29d-9dd4-4945-a35a-fb9a618002d7)
+<img width="700px" src="https://github.com/aceld/kis-flow/assets/7778936/efc1b29d-9dd4-4945-a35a-fb9a618002d7" />
+
 
 KisFlow is a flow-based conceptual form, and its specific characteristics are as follows: <br />
 
