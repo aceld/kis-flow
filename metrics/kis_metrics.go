@@ -1,40 +1,41 @@
 package metrics
 
 import (
+	"net/http"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
-// kisMetrics kisFlow的Prometheus监控指标
-type kisMetrics struct {
-	// 数据数量总量
+// KisMetrics kisFlow's Prometheus monitoring metrics
+type KisMetrics struct {
+	// Total data quantity
 	DataTotal prometheus.Counter
-	// 各Flow处理数据总量
+	// Total data processed by each Flow
 	FlowDataTotal *prometheus.GaugeVec
-	// Flow被调度次数
+	// Flow scheduling counts
 	FlowScheduleCntsToTal *prometheus.GaugeVec
-	// Function被调度次数
+	// Function scheduling counts
 	FuncScheduleCntsTotal *prometheus.GaugeVec
-	// Function执行时间
+	// Function execution time
 	FunctionDuration *prometheus.HistogramVec
-	// Flow执行时间
+	// Flow execution time
 	FlowDuration *prometheus.HistogramVec
 }
 
-var Metrics *kisMetrics
+var Metrics *KisMetrics
 
-// RunMetricsService 启动Prometheus监控服务
+// RunMetricsService starts the Prometheus monitoring service
 func RunMetricsService(serverAddr string) error {
 
-	// 注册Prometheus 监控路由路径
-	http.Handle(common.METRICS_ROUTE, promhttp.Handler())
+	// Register Prometheus monitoring route path
+	http.Handle(common.MetricsRoute, promhttp.Handler())
 
-	// 启动HttpServer
-	err := http.ListenAndServe(serverAddr, nil) //多个进程不可监听同一个端口
+	// Start HttpServer
+	err := http.ListenAndServe(serverAddr, nil) // Multiple processes cannot listen on the same port
 	if err != nil {
 		log.Logger().ErrorF("RunMetricsService err = %s\n", err)
 	}
@@ -43,64 +44,64 @@ func RunMetricsService(serverAddr string) error {
 }
 
 func InitMetrics() {
-	Metrics = new(kisMetrics)
+	Metrics = new(KisMetrics)
 
-	// DataTotal初始化Counter
+	// Initialize DataTotal Counter
 	Metrics.DataTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: common.COUNTER_KISFLOW_DATA_TOTAL_NAME,
-		Help: common.COUNTER_KISFLOW_DATA_TOTAL_HELP,
+		Name: common.CounterKisflowDataTotalName,
+		Help: common.CounterKisflowDataTotalHelp,
 	})
 
-	// FlowDataTotal初始化GaugeVec
+	// Initialize FlowDataTotal GaugeVec
 	Metrics.FlowDataTotal = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: common.GANGE_FLOW_DATA_TOTAL_NAME,
-			Help: common.GANGE_FLOW_DATA_TOTAL_HELP,
+			Name: common.GamgeFlowDataTotalName,
+			Help: common.GamgeFlowDataTotalHelp,
 		},
-		// 标签名称
-		[]string{common.LABEL_FLOW_NAME},
+		// Label names
+		[]string{common.LabelFlowName},
 	)
 
-	// FlowScheduleCntsToTal初始化GaugeVec
+	// Initialize FlowScheduleCntsToTal GaugeVec
 	Metrics.FlowScheduleCntsToTal = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: common.GANGE_FLOW_SCHE_CNTS_NAME,
-			Help: common.GANGE_FLOW_SCHE_CNTS_HELP,
+			Name: common.GangeFlowScheCntsName,
+			Help: common.GangeFlowScheCntsHelp,
 		},
-		//标签名称
-		[]string{common.LABEL_FLOW_NAME},
+		// Label names
+		[]string{common.LabelFlowName},
 	)
 
-	// FuncScheduleCntsTotal初始化GaugeVec
+	// Initialize FuncScheduleCntsTotal GaugeVec
 	Metrics.FuncScheduleCntsTotal = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: common.GANGE_FUNC_SCHE_CNTS_NAME,
-			Help: common.GANGE_FUNC_SCHE_CNTS_HELP,
+			Name: common.GangeFuncScheCntsName,
+			Help: common.GangeFuncScheCntsHelp,
 		},
-		//标签名称
-		[]string{common.LABEL_FUNCTION_NAME, common.LABEL_FUNCTION_MODE},
+		// Label names
+		[]string{common.LabelFunctionName, common.LabelFunctionMode},
 	)
 
-	// FunctionDuration初始化HistogramVec
+	// Initialize FunctionDuration HistogramVec
 	Metrics.FunctionDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    common.HISTOGRAM_FUNCTION_DURATION_NAME,
-		Help:    common.HISTOGRAM_FUNCTION_DURATION_HELP,
-		Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000}, //单位ms,最大半分钟
+		Name:    common.HistogramFunctionDurationName,
+		Help:    common.HistogramFunctionDurationHelp,
+		Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000}, // Unit: ms, maximum half a minute
 	},
-		[]string{common.LABEL_FUNCTION_NAME, common.LABEL_FUNCTION_MODE},
+		[]string{common.LabelFunctionName, common.LabelFunctionMode},
 	)
 
-	// FlowDuration初始化HistogramVec
+	// Initialize FlowDuration HistogramVec
 	Metrics.FlowDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    common.HISTOGRAM_FLOW_DURATION_NAME,
-			Help:    common.HISTOGRAM_FLOW_DURATION_HELP,
-			Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000, 60000}, //单位ms,最大1分钟
+			Name:    common.HistogramFlowDurationName,
+			Help:    common.HistogramFlowDurationHelp,
+			Buckets: []float64{0.005, 0.01, 0.03, 0.08, 0.1, 0.5, 1.0, 5.0, 10, 100, 1000, 5000, 30000, 60000}, // Unit: ms, maximum 1 minute
 		},
-		[]string{common.LABEL_FLOW_NAME},
+		[]string{common.LabelFlowName},
 	)
 
-	// 注册Metrics
+	// Register Metrics
 	prometheus.MustRegister(Metrics.DataTotal)
 	prometheus.MustRegister(Metrics.FlowDataTotal)
 	prometheus.MustRegister(Metrics.FlowScheduleCntsToTal)
@@ -109,13 +110,13 @@ func InitMetrics() {
 	prometheus.MustRegister(Metrics.FlowDuration)
 }
 
-// RunMetrics 启动Prometheus指标服务
+// RunMetrics starts the Prometheus metrics service
 func RunMetrics() {
-	// 初始化Prometheus指标
+	// Initialize Prometheus metrics
 	InitMetrics()
 
 	if config.GlobalConfig.EnableProm == true && config.GlobalConfig.PrometheusListen == true {
-		// 启动Prometheus指标Metrics服务
+		// Start Prometheus metrics service
 		go RunMetricsService(config.GlobalConfig.PrometheusServe)
 	}
 }

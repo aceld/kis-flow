@@ -3,36 +3,38 @@ package function
 import (
 	"context"
 	"errors"
+	"sync"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/id"
 	"github.com/aceld/kis-flow/kis"
-	"sync"
 )
 
 type BaseFunction struct {
-	// Id , KisFunction的实例ID，用于KisFlow内部区分不同的实例对象
+	// Id, the instance ID of KisFunction, used to differentiate different instance objects within KisFlow
 	Id     string
 	Config *config.KisFuncConfig
 
 	// flow
-	flow kis.Flow //上下文环境KisFlow
+	flow kis.Flow // Context environment KisFlow
 
 	// connector
 	connector kis.Connector
 
-	// Function的自定义临时数据
+	// Custom temporary data of Function
 	metaData map[string]interface{}
-	// 管理metaData的读写锁
+	// Manage the read-write lock of metaData
 	mLock sync.RWMutex
 
 	// link
-	N kis.Function //下一个流计算Function
-	P kis.Function //上一个流计算Function
+	N kis.Function // Next flow computing Function
+	P kis.Function // Previous flow computing Function
 }
 
 // Call
-// BaseFunction 为空实现，目的为了让其他具体类型的KisFunction，如KisFunction_V 来继承BaseFuncion来重写此方法
+// BaseFunction is an empty implementation, designed to allow other specific types of KisFunction,
+// such as KisFunction_V, to inherit BaseFuncion and override this method
 func (base *BaseFunction) Call(ctx context.Context, flow kis.Flow) error { return nil }
 
 func (base *BaseFunction) Next() kis.Function {
@@ -61,24 +63,24 @@ func (base *BaseFunction) SetConfig(s *config.KisFuncConfig) error {
 	return nil
 }
 
-func (base *BaseFunction) GetId() string {
+func (base *BaseFunction) GetID() string {
 	return base.Id
 }
 
 func (base *BaseFunction) GetPrevId() string {
 	if base.P == nil {
-		//Function为首结点
-		return common.FunctionIdFirstVirtual
+		// Function is the first node
+		return common.FunctionIDFirstVirtual
 	}
-	return base.P.GetId()
+	return base.P.GetID()
 }
 
 func (base *BaseFunction) GetNextId() string {
 	if base.N == nil {
-		//Function为尾结点
-		return common.FunctionIdLastVirtual
+		// Function is the last node
+		return common.FunctionIDLastVirtual
 	}
-	return base.N.GetId()
+	return base.N.GetID()
 }
 
 func (base *BaseFunction) GetConfig() *config.KisFuncConfig {
@@ -97,7 +99,7 @@ func (base *BaseFunction) GetFlow() kis.Flow {
 	return base.flow
 }
 
-// AddConnector 给当前Function实例添加一个Connector
+// AddConnector adds a Connector to the current Function instance
 func (base *BaseFunction) AddConnector(conn kis.Connector) error {
 	if conn == nil {
 		return errors.New("conn is nil")
@@ -108,22 +110,22 @@ func (base *BaseFunction) AddConnector(conn kis.Connector) error {
 	return nil
 }
 
-// GetConnector 获取当前Function实例所关联的Connector
+// GetConnector gets the Connector associated with the current Function instance
 func (base *BaseFunction) GetConnector() kis.Connector {
 	return base.connector
 }
 
 func (base *BaseFunction) CreateId() {
-	base.Id = id.KisID(common.KisIdTypeFunction)
+	base.Id = id.KisID(common.KisIDTypeFunction)
 }
 
-// NewKisFunction 创建一个NsFunction
-// flow: 当前所属的flow实例
-// s : 当前function的配置策略
+// NewKisFunction creates a new NsFunction
+// flow: the current belonging flow instance
+// s: the configuration strategy of the current function
 func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	var f kis.Function
 
-	//工厂生产泛化对象
+	// Factory produces generic objects
 	switch common.KisMode(config.FMode) {
 	case common.V:
 		f = NewKisFunctionV()
@@ -136,19 +138,19 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	case common.E:
 		f = NewKisFunctionE()
 	default:
-		//LOG ERROR
+		// LOG ERROR
 		return nil
 	}
 
-	// 生成随机实例唯一ID
+	// Generate a random unique instance ID
 	f.CreateId()
 
-	// 设置基础信息属性
+	// Set basic information attributes
 	if err := f.SetConfig(config); err != nil {
 		panic(err)
 	}
 
-	// 设置Flow
+	// Set Flow
 	if err := f.SetFlow(flow); err != nil {
 		panic(err)
 	}
@@ -156,7 +158,7 @@ func NewKisFunction(flow kis.Flow, config *config.KisFuncConfig) kis.Function {
 	return f
 }
 
-// GetMetaData 得到当前Function的临时数据
+// GetMetaData gets the temporary data of the current Function
 func (base *BaseFunction) GetMetaData(key string) interface{} {
 	base.mLock.RLock()
 	defer base.mLock.RUnlock()
@@ -169,7 +171,7 @@ func (base *BaseFunction) GetMetaData(key string) interface{} {
 	return data
 }
 
-// SetMetaData 设置当前Function的临时数据
+// SetMetaData sets the temporary data of the current Function
 func (base *BaseFunction) SetMetaData(key string, value interface{}) {
 	base.mLock.Lock()
 	defer base.mLock.Unlock()

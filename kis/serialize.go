@@ -1,23 +1,24 @@
 package kis
 
 import (
+	"reflect"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/serialize"
-	"reflect"
 )
 
-// Serialize 数据序列化接口
+// Serialize Data serialization interface
 type Serialize interface {
-	// UnMarshal 用于将 KisRowArr 反序列化为指定类型的值。
+	// UnMarshal is used to deserialize KisRowArr to a value of the specified type.
 	UnMarshal(common.KisRowArr, reflect.Type) (reflect.Value, error)
-	// Marshal 用于将指定类型的值序列化为 KisRowArr。
+	// Marshal is used to serialize a value of the specified type to KisRowArr.
 	Marshal(interface{}) (common.KisRowArr, error)
 }
 
-// defaultSerialize KisFlow提供的默认序列化实现(开发者可以自定义)
+// defaultSerialize Default serialization implementation provided by KisFlow (developers can customize)
 var defaultSerialize = &serialize.DefaultSerialize{}
 
-// isSerialize 判断传递进来的 paramType 是否实现了 Serialize 接口
+// isSerialize checks if the provided paramType implements the Serialize interface
 func isSerialize(paramType reflect.Type) bool {
 	return paramType.Implements(reflect.TypeOf((*Serialize)(nil)).Elem())
 }

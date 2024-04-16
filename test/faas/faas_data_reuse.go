@@ -3,6 +3,7 @@ package faas
 import (
 	"context"
 	"fmt"
+
 	"github.com/aceld/kis-flow/kis"
 )
 
@@ -12,13 +13,11 @@ func DataReuseFuncHandler(ctx context.Context, flow kis.Flow) error {
 	fmt.Println("---> Call DataReuseFuncHandler ----")
 
 	for index, row := range flow.Input() {
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
+		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetID(), row)
 		fmt.Println(str)
 
-		// 计算结果数据
 		resultStr := fmt.Sprintf("data from funcName[%s], index = %d", flow.GetThisFuncConf().FName, index)
 
-		// 提交结果数据
 		_ = flow.CommitRow(resultStr)
 	}
 

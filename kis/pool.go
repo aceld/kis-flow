@@ -4,45 +4,46 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aceld/kis-flow/common"
-	"github.com/aceld/kis-flow/log"
 	"reflect"
 	"sync"
+
+	"github.com/aceld/kis-flow/common"
+	"github.com/aceld/kis-flow/log"
 )
 
 var _poolOnce sync.Once
 
-// kisPool 用于管理全部的Function和Flow配置的池子
-type kisPool struct {
-	fnRouter funcRouter   // 全部的Function管理路由
-	fnLock   sync.RWMutex // fnRouter 锁
+// KisPool manages all Function and Flow configurations
+type KisPool struct {
+	fnRouter funcRouter   // All Function management routes
+	fnLock   sync.RWMutex // fnRouter lock
 
-	flowRouter flowRouter   // 全部的flow对象
-	flowLock   sync.RWMutex // flowRouter 锁
+	flowRouter flowRouter   // All flow objects
+	flowLock   sync.RWMutex // flowRouter lock
 
-	cInitRouter connInitRouter // 全部的Connector初始化路由
-	ciLock      sync.RWMutex   // cInitRouter 锁
+	cInitRouter connInitRouter // All Connector initialization routes
+	ciLock      sync.RWMutex   // cInitRouter lock
 
-	cTree connTree     // 全部Connector管理路由
-	cLock sync.RWMutex // cTree 锁
+	cTree connTree     // All Connector management routes
+	cLock sync.RWMutex // cTree lock
 }
 
-// 单例
-var _pool *kisPool
+// Singleton
+var _pool *KisPool
 
-// Pool 单例构造
-func Pool() *kisPool {
+// Pool Singleton constructor
+func Pool() *KisPool {
 	_poolOnce.Do(func() {
-		//创建kisPool对象
-		_pool = new(kisPool)
+		// Create KisPool object
+		_pool = &KisPool{}
 
-		// fnRouter初始化
+		// Initialize fnRouter
 		_pool.fnRouter = make(funcRouter)
 
-		// flowRouter初始化
+		// Initialize flowRouter
 		_pool.flowRouter = make(flowRouter)
 
-		// connTree初始化
+		// Initialize connTree
 		_pool.cTree = make(connTree)
 		_pool.cInitRouter = make(connInitRouter)
 	})
@@ -50,8 +51,8 @@ func Pool() *kisPool {
 	return _pool
 }
 
-func (pool *kisPool) AddFlow(name string, flow Flow) {
-	pool.flowLock.Lock() // 写锁
+func (pool *KisPool) AddFlow(name string, flow Flow) {
+	pool.flowLock.Lock() // Write lock
 	defer pool.flowLock.Unlock()
 
 	if _, ok := pool.flowRouter[name]; !ok {
@@ -64,8 +65,8 @@ func (pool *kisPool) AddFlow(name string, flow Flow) {
 	log.Logger().InfoF("Add FlowRouter FlowName=%s", name)
 }
 
-func (pool *kisPool) GetFlow(name string) Flow {
-	pool.flowLock.RLock() // 读锁
+func (pool *KisPool) GetFlow(name string) Flow {
+	pool.flowLock.RLock() // Read lock
 	defer pool.flowLock.RUnlock()
 
 	if flow, ok := pool.flowRouter[name]; ok {
@@ -75,20 +76,20 @@ func (pool *kisPool) GetFlow(name string) Flow {
 	}
 }
 
-// FaaS 注册 Function 计算业务逻辑, 通过Function Name 索引及注册
-func (pool *kisPool) FaaS(fnName string, f FaaS) {
+// FaaS registers Function computation business logic, indexed and registered by Function Name
+func (pool *KisPool) FaaS(fnName string, f FaaS) {
 
-	// 当注册FaaS计算逻辑回调时，创建一个FaaSDesc描述对象
+	// When registering the FaaS computation logic callback, create a FaaSDesc description object
 	faaSDesc, err := NewFaaSDesc(fnName, f)
 	if err != nil {
 		panic(err)
 	}
 
-	pool.fnLock.Lock() // 写锁
+	pool.fnLock.Lock() // Write lock
 	defer pool.fnLock.Unlock()
 
 	if _, ok := pool.fnRouter[fnName]; !ok {
-		// 将FaaSDesc描述对象注册到fnRouter中
+		// Register the FaaSDesc description object to fnRouter
 		pool.fnRouter[fnName] = faaSDesc
 	} else {
 		errString := fmt.Sprintf("KisPoll FaaS Repeat FuncName=%s", fnName)
@@ -98,33 +99,33 @@ func (pool *kisPool) FaaS(fnName string, f FaaS) {
 	log.Logger().InfoF("Add KisPool FuncName=%s", fnName)
 }
 
-// CallFunction 调度 Function
-func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow) error {
-	pool.fnLock.RLock() // 读锁
+// CallFunction schedules Function
+func (pool *KisPool) CallFunction(ctx context.Context, fnName string, flow Flow) error {
+	pool.fnLock.RLock() // Read lock
 	defer pool.fnLock.RUnlock()
 	if funcDesc, ok := pool.fnRouter[fnName]; ok {
 
-		// 被调度Function的形参列表
+		// Parameters list for the scheduled Function
 		params := make([]reflect.Value, 0, funcDesc.ArgNum)
 
 		for _, argType := range funcDesc.ArgsType {
 
-			// 如果是Flow类型形参，则将 flow的值传入
+			// If it is a Flow type parameter, pass in the value of flow
 			if isFlowType(argType) {
 				params = append(params, reflect.ValueOf(flow))
 				continue
 			}
 
-			// 如果是Context类型形参，则将 ctx的值传入
+			// If it is a Context type parameter, pass in the value of ctx
 			if isContextType(argType) {
 				params = append(params, reflect.ValueOf(ctx))
 				continue
 			}
 
-			// 如果是Slice类型形参，则将 flow.Input()的值传入
+			// If it is a Slice type parameter, pass in the value of flow.Input()
 			if isSliceType(argType) {
 
-				// 将flow.Input()中的原始数据，反序列化为argType类型的数据
+				// Deserialize the raw data in flow.Input() to data of type argType
 				value, err := funcDesc.Serialize.UnMarshal(flow.Input(), argType)
 				if err != nil {
 					log.Logger().ErrorFX(ctx, "funcDesc.Serialize.DecodeParam err=%v", err)
@@ -135,20 +136,20 @@ func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow)
 
 			}
 
-			// 传递的参数，既不是Flow类型，也不是Context类型，也不是Slice类型，则默认给到零值
+			// If the passed parameter is neither a Flow type, nor a Context type, nor a Slice type, it defaults to zero value
 			params = append(params, reflect.Zero(argType))
 		}
 
-		// 调用当前Function 的计算逻辑
+		// Call the computation logic of the current Function
 		retValues := funcDesc.FuncValue.Call(params)
 
-		// 取出第一个返回值，如果是nil，则返回nil
+		// Extract the first return value, if it is nil, return nil
 		ret := retValues[0].Interface()
 		if ret == nil {
 			return nil
 		}
 
-		// 如果返回值是error类型，则返回error
+		// If the return value is of type error, return error
 		return retValues[0].Interface().(error)
 
 	}
@@ -158,9 +159,9 @@ func (pool *kisPool) CallFunction(ctx context.Context, fnName string, flow Flow)
 	return errors.New("FuncName: " + fnName + " Can not find in NsPool, Not Added.")
 }
 
-// CaaSInit 注册Connector初始化业务
-func (pool *kisPool) CaaSInit(cname string, c ConnInit) {
-	pool.ciLock.Lock() // 写锁
+// CaaSInit registers Connector initialization business
+func (pool *KisPool) CaaSInit(cname string, c ConnInit) {
+	pool.ciLock.Lock() // Write lock
 	defer pool.ciLock.Unlock()
 
 	if _, ok := pool.cInitRouter[cname]; !ok {
@@ -173,9 +174,9 @@ func (pool *kisPool) CaaSInit(cname string, c ConnInit) {
 	log.Logger().InfoF("Add KisPool CaaSInit CName=%s", cname)
 }
 
-// CallConnInit 调度 ConnInit
-func (pool *kisPool) CallConnInit(conn Connector) error {
-	pool.ciLock.RLock() // 读锁
+// CallConnInit schedules ConnInit
+func (pool *KisPool) CallConnInit(conn Connector) error {
+	pool.ciLock.RLock() // Read lock
 	defer pool.ciLock.RUnlock()
 
 	init, ok := pool.cInitRouter[conn.GetName()]
@@ -187,16 +188,16 @@ func (pool *kisPool) CallConnInit(conn Connector) error {
 	return init(conn)
 }
 
-// CaaS 注册Connector Call业务
-func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c CaaS) {
-	pool.cLock.Lock() // 写锁
+// CaaS registers Connector Call business
+func (pool *KisPool) CaaS(cname string, fname string, mode common.KisMode, c CaaS) {
+	pool.cLock.Lock() // Write lock
 	defer pool.cLock.Unlock()
 
 	if _, ok := pool.cTree[cname]; !ok {
-		//cid 首次注册，不存在，创建二级树NsConnSL
+		//cid First registration, does not exist, create a second-level tree NsConnSL
 		pool.cTree[cname] = make(connSL)
 
-		//初始化各类型FunctionMode
+		// Initialize various FunctionMode
 		pool.cTree[cname][common.S] = make(connFuncRouter)
 		pool.cTree[cname][common.L] = make(connFuncRouter)
 	}
@@ -211,9 +212,9 @@ func (pool *kisPool) CaaS(cname string, fname string, mode common.KisMode, c Caa
 	log.Logger().InfoF("Add KisPool CaaS CName=%s, FName=%s, Mode =%s", cname, fname, mode)
 }
 
-// CallConnector 调度 Connector
-func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connector, args interface{}) (interface{}, error) {
-	pool.cLock.RLock() // 读锁
+// CallConnector schedules Connector
+func (pool *KisPool) CallConnector(ctx context.Context, flow Flow, conn Connector, args interface{}) (interface{}, error) {
+	pool.cLock.RLock() // Read lock
 	defer pool.cLock.RUnlock()
 	fn := flow.GetThisFunction()
 	fnConf := fn.GetConfig()
@@ -228,9 +229,9 @@ func (pool *kisPool) CallConnector(ctx context.Context, flow Flow, conn Connecto
 	return nil, errors.New(fmt.Sprintf("CName:%s FName:%s mode:%s Can not find in KisPool, Not Added.", conn.GetName(), fnConf.FName, mode))
 }
 
-// GetFlows 得到全部的Flow
-func (pool *kisPool) GetFlows() []Flow {
-	pool.flowLock.RLock() // 读锁
+// GetFlows retrieves all Flows
+func (pool *KisPool) GetFlows() []Flow {
+	pool.flowLock.RLock() // Read lock
 	defer pool.flowLock.RUnlock()
 
 	var flows []Flow

@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/aceld/kis-flow/metrics"
 	"testing"
+
+	"github.com/aceld/kis-flow/metrics"
 )
 
 func TestPrometheusServer(t *testing.T) {

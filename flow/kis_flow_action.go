@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/aceld/kis-flow/kis"
 )
 
-// dealAction  处理Action，决定接下来Flow的流程走向
+// dealAction handles Action to determine the next direction of the Flow.
 func (flow *KisFlow) dealAction(ctx context.Context, fn kis.Function) (kis.Function, error) {
 
 	// DataReuse Action
@@ -32,31 +33,31 @@ func (flow *KisFlow) dealAction(ctx context.Context, fn kis.Function) (kis.Funct
 	// JumpFunc Action
 	if flow.action.JumpFunc != "" {
 		if _, ok := flow.Funcs[flow.action.JumpFunc]; !ok {
-			//当前JumpFunc不在flow中
+			// The current JumpFunc is not in the flow
 			return nil, errors.New(fmt.Sprintf("Flow Jump -> %s is not in Flow", flow.action.JumpFunc))
 		}
 
 		jumpFunction := flow.Funcs[flow.action.JumpFunc]
-		// 更新上层Function
+		// Update the upper layer Function
 		flow.PrevFunctionId = jumpFunction.GetPrevId()
 		fn = jumpFunction
 
-		// 如果设置跳跃，强制跳跃
+		// If set to jump, force the jump
 		flow.abort = false
 
 	} else {
 
-		// 更新上一层 FuncitonId 游标
+		// Update the upper layer FunctionId cursor
 		flow.PrevFunctionId = flow.ThisFunctionId
 		fn = fn.Next()
 	}
 
-	// Abort Action 强制终止
+	// Abort Action force termination
 	if flow.action.Abort {
 		flow.abort = true
 	}
 
-	// 清空Action
+	// Clear Action
 	flow.action = kis.Action{}
 
 	return fn, nil

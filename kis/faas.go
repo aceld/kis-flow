@@ -10,113 +10,109 @@ import (
 
 // FaaS Function as a Service
 
-// 将
+// Change the type definition from:
 // type FaaS func(context.Context, Flow) error
-// 改为
+// to:
 // type FaaS func(context.Context, Flow, ...interface{}) error
-// 可以通过可变参数的任意输入类型进行数据传递
+// This allows passing data through variadic parameters of any type.
 type FaaS interface{}
 
-// FaaSDesc FaaS 回调计算业务函数 描述
+// FaaSDesc describes the FaaS callback computation function.
 type FaaSDesc struct {
-	Serialize                // 当前Function的数据输入输出序列化实现
-	FnName    string         // Function名称
-	f         interface{}    // FaaS 函数
-	fName     string         // 函数名称
-	ArgsType  []reflect.Type // 函数参数类型（集合）
-	ArgNum    int            // 函数参数个数
-	FuncType  reflect.Type   // 函数类型
-	FuncValue reflect.Value  // 函数值(函数地址)
+	Serialize                // Serialization implementation for the current Function's data input and output
+	FnName    string         // Function name
+	f         interface{}    // FaaS function
+	fName     string         // Function name
+	ArgsType  []reflect.Type // Function parameter types (collection)
+	ArgNum    int            // Number of function parameters
+	FuncType  reflect.Type   // Function type
+	FuncValue reflect.Value  // Function value (function address)
 }
 
-// NewFaaSDesc 根据用户注册的FnName 和FaaS 回调函数，创建 FaaSDesc 描述实例
+// NewFaaSDesc creates an instance of FaaSDesc description based on the registered FnName and FaaS callback function.
 func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
 
-	// 输入输出序列化实例
+	// Serialization instance
 	var serializeImpl Serialize
 
-	// 传入的回调函数FaaS,函数值(函数地址)
+	// Callback function value (function address)
 	funcValue := reflect.ValueOf(f)
 
-	// 传入的回调函数FaaS 类型
+	// Callback function type
 	funcType := funcValue.Type()
 
-	// 判断传递的FaaS指针是否是函数类型
+	// Check if the provided FaaS pointer is a function type
 	if !isFuncType(funcType) {
 		return nil, fmt.Errorf("provided FaaS type is %s, not a function", funcType.Name())
 	}
 
-	// 判断传递的FaaS函数是否有返回值类型是只包括(error)
+	// Check if the FaaS function has a return value that only includes (error)
 	if funcType.NumOut() != 1 || funcType.Out(0) != reflect.TypeOf((*error)(nil)).Elem() {
 		return nil, errors.New("function must have exactly one return value of type error")
 	}
 
-	// FaaS函数的参数类型集合
+	// FaaS function parameter types
 	argsType := make([]reflect.Type, funcType.NumIn())
 
-	// 获取FaaS的函数名称
+	// Get the FaaS function name
 	fullName := runtime.FuncForPC(funcValue.Pointer()).Name()
 
-	// 确保  FaaS func(context.Context, Flow, ...interface{}) error 形参列表，存在context.Context 和 kis.Flow
-
-	// 是否包含kis.Flow类型的形参
+	// Ensure that the FaaS function parameter list contains context.Context and kis.Flow
+	// Check if the function contains a parameter of type kis.Flow
 	containsKisFlow := false
-	// 是否包含context.Context类型的形参
+	// Check if the function contains a parameter of type context.Context
 	containsCtx := false
 
-	// 遍历FaaS的形参类型
+	// Iterate over the FaaS function parameter types
 	for i := 0; i < funcType.NumIn(); i++ {
 
-		// 取出第i个形式参数类型
+		// Get the i-th formal parameter type
 		paramType := funcType.In(i)
 
 		if isFlowType(paramType) {
-			// 判断是否包含kis.Flow类型的形参
+			// Check if the function contains a parameter of type kis.Flow
 			containsKisFlow = true
 
 		} else if isContextType(paramType) {
-			// 判断是否包含context.Context类型的形参
+			// Check if the function contains a parameter of type context.Context
 			containsCtx = true
 
 		} else if isSliceType(paramType) {
 
-			// 获取当前参数Slice的元素类型
+			// Get the element type of the current parameter Slice
 			itemType := paramType.Elem()
 
-			// 如果当前参数是一个指针类型，则获取指针指向的结构体类型
+			// If the current parameter is a pointer type, get the struct type that the pointer points to
 			if itemType.Kind() == reflect.Ptr {
-				itemType = itemType.Elem() // 获取指针指向的结构体类型
+				itemType = itemType.Elem() // Get the struct type that the pointer points to
 			}
 
 			// Check if f implements Serialize interface
-			// (检测传递的FaaS函数是否实现了Serialize接口)
 			if isSerialize(itemType) {
-				// 如果当前形参实现了Serialize接口，则使用当前形参的序列化实现
+				// If the current parameter implements the Serialize interface, use the serialization implementation of the current parameter
 				serializeImpl = reflect.New(itemType).Interface().(Serialize)
 
 			} else {
-				// 如果当前形参没有实现Serialize接口，则使用默认的序列化实现
+				// If the current parameter does not implement the Serialize interface, use the default serialization implementation
 				serializeImpl = defaultSerialize // Use global default implementation
 			}
-		} else {
-			// Other types are not supported
 		}
 
-		// 将当前形参类型追加到argsType集合中
+		// Append the current parameter type to the argsType collection
 		argsType[i] = paramType
 	}
 
 	if !containsKisFlow {
-		// 不包含kis.Flow类型的形参，返回错误
+		// If the function parameter list does not contain a parameter of type kis.Flow, return an error
 		return nil, errors.New("function parameters must have kis.Flow param, please use FaaS type like: [type FaaS func(context.Context, Flow, ...interface{}) error]")
 	}
 
 	if !containsCtx {
-		// 不包含context.Context类型的形参，返回错误
+		// If the function parameter list does not contain a parameter of type context.Context, return an error
 		return nil, errors.New("function parameters must have context, please use FaaS type like: [type FaaS func(context.Context, Flow, ...interface{}) error]")
 	}
 
-	// 返回FaaSDesc描述实例
+	// Return the FaaSDesc description instance
 	return &FaaSDesc{
 		Serialize: serializeImpl,
 		FnName:    fnName,
@@ -129,26 +125,26 @@ func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
 	}, nil
 }
 
-// isFuncType 判断传递进来的 paramType 是否是函数类型
+// isFuncType checks whether the provided paramType is a function type
 func isFuncType(paramType reflect.Type) bool {
 	return paramType.Kind() == reflect.Func
 }
 
-// isFlowType 判断传递进来的 paramType 是否是 kis.Flow 类型
+// isFlowType checks whether the provided paramType is of type kis.Flow
 func isFlowType(paramType reflect.Type) bool {
 	var flowInterfaceType = reflect.TypeOf((*Flow)(nil)).Elem()
 
 	return paramType.Implements(flowInterfaceType)
 }
 
-// isContextType 判断传递进来的 paramType 是否是 context.Context 类型
+// isContextType checks whether the provided paramType is of type context.Context
 func isContextType(paramType reflect.Type) bool {
 	typeName := paramType.Name()
 
 	return strings.Contains(typeName, "Context")
 }
 
-// isSliceType 判断传递进来的 paramType 是否是切片类型
+// isSliceType checks whether the provided paramType is a slice type
 func isSliceType(paramType reflect.Type) bool {
 	return paramType.Kind() == reflect.Slice
 }

@@ -2,49 +2,49 @@ package kis
 
 import (
 	"context"
+
 	"github.com/aceld/kis-flow/config"
 )
 
-// Function 流式计算基础计算模块，KisFunction是一条流式计算的基本计算逻辑单元，
-// 			   任意个KisFunction可以组合成一个KisFlow
+// Function is the basic computation unit of streaming computation. KisFunction is a basic logical unit of streaming computation, any number of KisFunctions can be combined into a KisFlow
 type Function interface {
-	// Call 执行流式计算逻辑
+	// Call executes the streaming computation logic
 	Call(ctx context.Context, flow Flow) error
 
-	// SetConfig 给当前Function实例配置策略
+	// SetConfig configures the current Function instance
 	SetConfig(s *config.KisFuncConfig) error
-	// GetConfig 获取当前Function实例配置策略
+	// GetConfig retrieves the configuration of the current Function instance
 	GetConfig() *config.KisFuncConfig
 
-	// SetFlow 给当前Function实例设置所依赖的Flow实例
+	// SetFlow sets the Flow instance that the current Function instance depends on
 	SetFlow(f Flow) error
-	// GetFlow 获取当前Functioin实力所依赖的Flow
+	// GetFlow retrieves the Flow instance that the current Function instance depends on
 	GetFlow() Flow
 
-	// AddConnector 给当前Function实例添加一个Connector
+	// AddConnector adds a Connector to the current Function instance
 	AddConnector(conn Connector) error
-	// GetConnector 获取当前Function实例所关联的Connector
+	// GetConnector retrieves the Connector associated with the current Function instance
 	GetConnector() Connector
 
-	// CreateId 给当前Funciton实力生成一个随机的实例KisID
+	// CreateId generates a random KisID for the current Function instance
 	CreateId()
-	// GetId 获取当前Function的FID
-	GetId() string
-	// GetPrevId 获取当前Function上一个Function节点FID
+	// GetID retrieves the FID of the current Function
+	GetID() string
+	// GetPrevId retrieves the FID of the previous Function node of the current Function
 	GetPrevId() string
-	// GetNextId 获取当前Function下一个Function节点FID
+	// GetNextId retrieves the FID of the next Function node of the current Function
 	GetNextId() string
 
-	// Next 返回下一层计算流Function，如果当前层为最后一层，则返回nil
+	// Next returns the next layer of the computation flow Function. If the current layer is the last layer, it returns nil
 	Next() Function
-	// Prev 返回上一层计算流Function，如果当前层为最后一层，则返回nil
+	// Prev returns the previous layer of the computation flow Function. If the current layer is the last layer, it returns nil
 	Prev() Function
-	// SetN 设置下一层Function实例
+	// SetN sets the next Function instance
 	SetN(f Function)
-	// SetP 设置上一层Function实例
+	// SetP sets the previous Function instance
 	SetP(f Function)
-	// GetMetaData 得到当前Function的临时数据
+	// GetMetaData retrieves the temporary data of the current Function
 	GetMetaData(key string) interface{}
-	// SetMetaData 设置当前Function的临时数据
+	// SetMetaData sets the temporary data of the current Function
 	SetMetaData(key string, value interface{})
 }

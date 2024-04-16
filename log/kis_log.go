@@ -3,33 +3,33 @@ package log
 import "context"
 
 type KisLogger interface {
-	// InfoFX 有上下文的Info级别日志接口, format字符串格式
+	// InfoFX with context Info-level log interface, format string format
 	InfoFX(ctx context.Context, str string, v ...interface{})
-	// ErrorFX 有上下文的Error级别日志接口, format字符串格式
+	// ErrorFX with context Error-level log interface, format string format
 	ErrorFX(ctx context.Context, str string, v ...interface{})
-	// DebugFX 有上下文的Debug级别日志接口, format字符串格式
+	// DebugFX with context Debug-level log interface, format string format
 	DebugFX(ctx context.Context, str string, v ...interface{})
 
-	// InfoF 无上下文的Info级别日志接口, format字符串格式
+	// InfoF without context Info-level log interface, format string format
 	InfoF(str string, v ...interface{})
-	// ErrorF 无上下文的Error级别日志接口, format字符串格式
+	// ErrorF without context Error-level log interface, format string format
 	ErrorF(str string, v ...interface{})
-	// DebugF 无上下文的Debug级别日志接口, format字符串格式
+	// DebugF without context Debug-level log interface, format string format
 	DebugF(str string, v ...interface{})
 
-	// SetDebugMode 设置Debug模式
+	// SetDebugMode set Debug mode
 	SetDebugMode(enable bool)
 }
 
-// kisLog 默认的KisLog 对象， 提供默认的日志打印方式, 均是打印在标准输出上。
+// kisLog Default KisLog object, providing default log printing methods, all of which print to standard output.
 var kisLog KisLogger
 
-// SetLogger 设置KisLog对象, 可以是用户自定义的Logger对象
+// SetLogger set KisLog object, can be a user-defined Logger object
 func SetLogger(newlog KisLogger) {
 	kisLog = newlog
 }
 
-// Logger 获取到kisLog对象
+// Logger get the kisLog object
 func Logger() KisLogger {
 	return kisLog
 }

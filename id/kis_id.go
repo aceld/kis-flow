@@ -1,17 +1,18 @@
 package id
 
 import (
+	"strings"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/google/uuid"
-	"strings"
 )
 
-// KisID 获取一个中随机实例ID
-// 格式为  "prefix1-[prefix2-][prefix3-]ID"
-// 如：flow-1234567890
-// 如：func-1234567890
-// 如: conn-1234567890
-// 如: func-1-1234567890
+// KisID generates a random instance ID.
+// The format is "prefix1-[prefix2-][prefix3-]ID"
+// Example: flow-1234567890
+// Example: func-1234567890
+// Example: conn-1234567890
+// Example: func-1-1234567890
 func KisID(prefix ...string) (kisId string) {
 
 	idStr := strings.Replace(uuid.New().String(), "-", "", -1)
@@ -25,7 +26,7 @@ func formatKisID(idStr string, prefix ...string) string {
 
 	for _, fix := range prefix {
 		kisId += fix
-		kisId += common.KisIdJoinChar
+		kisId += common.KisIDJoinChar
 	}
 
 	kisId += idStr

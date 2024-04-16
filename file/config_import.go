@@ -1,18 +1,17 @@
 package file
 
 import (
-	"errors"
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/flow"
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/metrics"
-	"os"
-	"path"
-	"path/filepath"
-
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type allConfig struct {
@@ -21,75 +20,75 @@ type allConfig struct {
 	Conns map[string]*config.KisConnConfig
 }
 
-// kisTypeFlowConfigure 解析Flow配置文件，yaml格式
+// kisTypeFlowConfigure parses Flow configuration file in yaml format
 func kisTypeFlowConfigure(all *allConfig, confData []byte, fileName string, kisType interface{}) error {
 	flowCfg := new(config.KisFlowConfig)
 	if ok := yaml.Unmarshal(confData, flowCfg); ok != nil {
-		return errors.New(fmt.Sprintf("%s has wrong format kisType = %s", fileName, kisType))
+		return fmt.Errorf("%s has wrong format kisType = %s", fileName, kisType)
 	}
 
-	// 如果FLow状态为关闭，则不做配置加载
+	// Skip the configuration loading if the Flow status is disabled
 	if common.KisOnOff(flowCfg.Status) == common.FlowDisable {
 		return nil
 	}
 
 	if _, ok := all.Flows[flowCfg.FlowName]; ok {
-		return errors.New(fmt.Sprintf("%s set repeat flow_id:%s", fileName, flowCfg.FlowName))
+		return fmt.Errorf("%s set repeat flow_id:%s", fileName, flowCfg.FlowName)
 	}
 
-	// 加入配置集合中
+	// Add to the configuration set
 	all.Flows[flowCfg.FlowName] = flowCfg
 
 	return nil
 }
 
-// kisTypeFuncConfigure 解析Function配置文件，yaml格式
+// kisTypeFuncConfigure parses Function configuration file in yaml format
 func kisTypeFuncConfigure(all *allConfig, confData []byte, fileName string, kisType interface{}) error {
 	function := new(config.KisFuncConfig)
 	if ok := yaml.Unmarshal(confData, function); ok != nil {
-		return errors.New(fmt.Sprintf("%s has wrong format kisType = %s", fileName, kisType))
+		return fmt.Errorf("%s has wrong format kisType = %s", fileName, kisType)
 	}
 	if _, ok := all.Funcs[function.FName]; ok {
-		return errors.New(fmt.Sprintf("%s set repeat function_id:%s", fileName, function.FName))
+		return fmt.Errorf("%s set repeat function_id:%s", fileName, function.FName)
 	}
 
-	// 加入配置集合中
+	// Add to the configuration set
 	all.Funcs[function.FName] = function
 
 	return nil
 }
 
-// kisTypeConnConfigure 解析Connector配置文件，yaml格式
+// kisTypeConnConfigure parses Connector configuration file in yaml format
 func kisTypeConnConfigure(all *allConfig, confData []byte, fileName string, kisType interface{}) error {
 	conn := new(config.KisConnConfig)
 	if ok := yaml.Unmarshal(confData, conn); ok != nil {
-		return errors.New(fmt.Sprintf("%s is wrong format kisType = %s", fileName, kisType))
+		return fmt.Errorf("%s has wrong format kisType = %s", fileName, kisType)
 	}
 
 	if _, ok := all.Conns[conn.CName]; ok {
-		return errors.New(fmt.Sprintf("%s set repeat conn_id:%s", fileName, conn.CName))
+		return fmt.Errorf("%s set repeat conn_id:%s", fileName, conn.CName)
 	}
 
-	// 加入配置集合中
+	// Add to the configuration set
 	all.Conns[conn.CName] = conn
 
 	return nil
 }
 
-// kisTypeGlobalConfigure 解析Global配置文件，yaml格式
+// kisTypeGlobalConfigure parses Global configuration file in yaml format
 func kisTypeGlobalConfigure(confData []byte, fileName string, kisType interface{}) error {
-	// 全局配置
+	// Global configuration
 	if ok := yaml.Unmarshal(confData, config.GlobalConfig); ok != nil {
-		return errors.New(fmt.Sprintf("%s is wrong format kisType = %s", fileName, kisType))
+		return fmt.Errorf("%s is wrong format kisType = %s", fileName, kisType)
 	}
 
-	// 启动Metrics服务
+	// Start Metrics service
 	metrics.RunMetrics()
 
 	return nil
 }
 
-// parseConfigWalkYaml 全盘解析配置文件，yaml格式, 讲配置信息解析到allConfig中
+// parseConfigWalkYaml recursively parses all configuration files in yaml format and stores the configuration information in allConfig
 func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 
 	all := new(allConfig)
@@ -99,12 +98,12 @@ func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 	all.Conns = make(map[string]*config.KisConnConfig)
 
 	err := filepath.Walk(loadPath, func(filePath string, info os.FileInfo, err error) error {
-		// 校验文件后缀是否合法
+		// Validate the file extension
 		if suffix := path.Ext(filePath); suffix != ".yml" && suffix != ".yaml" {
 			return nil
 		}
 
-		// 读取文件内容
+		// Read file content
 		confData, err := os.ReadFile(filePath)
 		if err != nil {
 			return err
@@ -112,31 +111,34 @@ func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 
 		confMap := make(map[string]interface{})
 
-		// 校验yaml合法性
+		// Validate yaml format
 		if err := yaml.Unmarshal(confData, confMap); err != nil {
 			return err
 		}
 
-		// 判断kisType是否存在
-		if kisType, ok := confMap["kistype"]; !ok {
-			return errors.New(fmt.Sprintf("yaml file %s has no file [kistype]!", filePath))
-		} else {
-			switch kisType {
-			case common.KisIdTypeFlow:
-				return kisTypeFlowConfigure(all, confData, filePath, kisType)
+		// Check if kisType exists
+		var kisType interface{}
 
-			case common.KisIdTypeFunction:
-				return kisTypeFuncConfigure(all, confData, filePath, kisType)
+		kisType, ok := confMap["kistype"]
+		if !ok {
+			return fmt.Errorf("%s has no field [kistype]", filePath)
+		}
 
-			case common.KisIdTypeConnector:
-				return kisTypeConnConfigure(all, confData, filePath, kisType)
+		switch kisType {
+		case common.KisIDTypeFlow:
+			return kisTypeFlowConfigure(all, confData, filePath, kisType)
 
-			case common.KisIdTypeGlobal:
-				return kisTypeGlobalConfigure(confData, filePath, kisType)
+		case common.KisIDTypeFunction:
+			return kisTypeFuncConfigure(all, confData, filePath, kisType)
 
-			default:
-				return errors.New(fmt.Sprintf("%s set wrong kistype %s", filePath, kisType))
-			}
+		case common.KisIDTypeConnector:
+			return kisTypeConnConfigure(all, confData, filePath, kisType)
+
+		case common.KisIDTypeGlobal:
+			return kisTypeGlobalConfigure(confData, filePath, kisType)
+
+		default:
+			return fmt.Errorf("%s set wrong kistype %s", filePath, kisType)
 		}
 	})
 
@@ -148,17 +150,17 @@ func parseConfigWalkYaml(loadPath string) (*allConfig, error) {
 }
 
 func buildFlow(all *allConfig, fp config.KisFlowFunctionParam, newFlow kis.Flow, flowName string) error {
-	// 加载当前Flow依赖的Function
+	// Load the Functions that the current Flow depends on
 	if funcConfig, ok := all.Funcs[fp.FuncName]; !ok {
-		return errors.New(fmt.Sprintf("FlowName [%s] need FuncName [%s], But has No This FuncName Config", flowName, fp.FuncName))
+		return fmt.Errorf("FlowName [%s] need FuncName [%s], But has No This FuncName Config", flowName, fp.FuncName)
 	} else {
 		// flow add connector
 		if funcConfig.Option.CName != "" {
-			// 加载当前Function依赖的Connector
+			// Load the Connectors that the current Function depends on
 			if connConf, ok := all.Conns[funcConfig.Option.CName]; !ok {
-				return errors.New(fmt.Sprintf("FuncName [%s] need ConnName [%s], But has No This ConnName Config", fp.FuncName, funcConfig.Option.CName))
+				return fmt.Errorf("FuncName [%s] need ConnName [%s], But has No This ConnName Config", fp.FuncName, funcConfig.Option.CName)
 			} else {
-				// Function Config 关联 Connector Config
+				// Function Config associates with Connector Config
 				_ = funcConfig.AddConnConfig(connConf)
 			}
 		}
@@ -172,7 +174,7 @@ func buildFlow(all *allConfig, fp config.KisFlowFunctionParam, newFlow kis.Flow,
 	return nil
 }
 
-// ConfigImportYaml 全盘解析配置文件，yaml格式
+// ConfigImportYaml recursively parses all configuration files in yaml format
 func ConfigImportYaml(loadPath string) error {
 
 	all, err := parseConfigWalkYaml(loadPath)
@@ -182,7 +184,7 @@ func ConfigImportYaml(loadPath string) error {
 
 	for flowName, flowConfig := range all.Flows {
 
-		// 构建一个Flow
+		// Build a new Flow
 		newFlow := flow.NewKisFlow(flowConfig)
 
 		for _, fp := range flowConfig.Flows {
@@ -191,7 +193,7 @@ func ConfigImportYaml(loadPath string) error {
 			}
 		}
 
-		// 将flow添加到FlowPool中
+		// Add the flow to FlowPool
 		kis.Pool().AddFlow(flowName, newFlow)
 	}
 

@@ -2,21 +2,22 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/log"
-	"testing"
 )
 
 func TestForkFlowCommitBatch(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. 加载配置文件并构建Flow
+	// 1. Load the configuration file and build the Flow
 	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		panic(err)
 	}
 
-	// 2. 获取Flow
+	// 2. Get the Flow
 	flow1 := kis.Pool().GetFlow("flowName1")
 
 	stringRows := []string{
@@ -25,13 +26,13 @@ func TestForkFlowCommitBatch(t *testing.T) {
 		"This is Data3 from Test",
 	}
 
-	// 3. 提交原始数据
+	// 3. Commit raw data
 	if err := flow1.CommitRowBatch(stringRows); err != nil {
 		log.Logger().ErrorF("CommitRowBatch Error, err = %+v", err)
 		panic(err)
 	}
 
-	// 4. 执行flow1
+	// 4. Execute flow1
 	if err := flow1.Run(ctx); err != nil {
 		panic(err)
 	}

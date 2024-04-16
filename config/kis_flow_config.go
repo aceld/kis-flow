@@ -2,13 +2,13 @@ package config
 
 import "github.com/aceld/kis-flow/common"
 
-// KisFlowFunctionParam 一个Flow配置中Function的Id及携带固定配置参数
+// KisFlowFunctionParam represents the Id of a Function and carries fixed configuration parameters in a Flow configuration
 type KisFlowFunctionParam struct {
-	FuncName string `yaml:"fname"`  //必须
-	Params   FParam `yaml:"params"` //选填,在当前Flow中Function定制固定配置参数
+	FuncName string `yaml:"fname"`  // Required
+	Params   FParam `yaml:"params"` // Optional, custom fixed configuration parameters for the Function in the current Flow
 }
 
-// KisFlowConfig 用户贯穿整条流式计算上下文环境的对象
+// KisFlowConfig represents the object that spans the entire stream computing context environment
 type KisFlowConfig struct {
 	KisType  string                 `yaml:"kistype"`
 	Status   int                    `yaml:"status"`
@@ -16,7 +16,7 @@ type KisFlowConfig struct {
 	Flows    []KisFlowFunctionParam `yaml:"flows"`
 }
 
-// NewFlowConfig 创建一个Flow策略配置对象, 用于描述一个KisFlow信息
+// NewFlowConfig creates a Flow strategy configuration object, used to describe a KisFlow information
 func NewFlowConfig(flowName string, enable common.KisOnOff) *KisFlowConfig {
 	config := new(KisFlowConfig)
 	config.FlowName = flowName
@@ -27,7 +27,7 @@ func NewFlowConfig(flowName string, enable common.KisOnOff) *KisFlowConfig {
 	return config
 }
 
-// AppendFunctionConfig 添加一个Function Config 到当前Flow中
+// AppendFunctionConfig adds a Function Config to the current Flow
 func (fConfig *KisFlowConfig) AppendFunctionConfig(params KisFlowFunctionParam) {
 	fConfig.Flows = append(fConfig.Flows, params)
 }

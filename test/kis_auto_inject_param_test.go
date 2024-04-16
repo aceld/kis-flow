@@ -2,6 +2,8 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/file"
@@ -9,7 +11,6 @@ import (
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/test/faas"
 	"github.com/aceld/kis-flow/test/proto"
-	"testing"
 )
 
 func TestAutoInjectParamWithConfig(t *testing.T) {
@@ -18,18 +19,18 @@ func TestAutoInjectParamWithConfig(t *testing.T) {
 	kis.Pool().FaaS("AvgStuScore", faas.AvgStuScore)
 	kis.Pool().FaaS("PrintStuAvgScore", faas.PrintStuAvgScore)
 
-	// 1. 加载配置文件并构建Flow
+	// 1. Load the configuration file and build the Flow
 	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		panic(err)
 	}
 
-	// 2. 获取Flow
+	// 2. Get the Flow
 	flow1 := kis.Pool().GetFlow("StuAvg")
 	if flow1 == nil {
 		panic("flow1 is nil")
 	}
 
-	// 3. 提交原始数据
+	// 3. Commit original data
 	_ = flow1.CommitRow(&faas.AvgStuScoreIn{
 		StuScores: proto.StuScores{
 			StuId:  100,
@@ -47,10 +48,10 @@ func TestAutoInjectParamWithConfig(t *testing.T) {
 		},
 	})
 
-	// 提交原始数据（json字符串）
+	// Commit original data (as JSON string)
 	_ = flow1.CommitRow(`{"stu_id":101}`)
 
-	// 4. 执行flow1
+	// 4. Execute flow1
 	if err := flow1.Run(ctx); err != nil {
 		panic(err)
 	}
@@ -81,7 +82,7 @@ func TestAutoInjectParam(t *testing.T) {
 
 	flow1 := flow.NewKisFlow(myFlowConfig1)
 
-	// 4. 拼接Functioin 到 Flow 上
+	// 4. Link Functions to Flow
 	if err := flow1.Link(avgStuScoreConfig, nil); err != nil {
 		panic(err)
 	}
@@ -89,7 +90,7 @@ func TestAutoInjectParam(t *testing.T) {
 		panic(err)
 	}
 
-	// 3. 提交原始数据
+	// 3. Commit original data
 	_ = flow1.CommitRow(&faas.AvgStuScoreIn{
 		StuScores: proto.StuScores{
 			StuId:  100,
@@ -108,7 +109,7 @@ func TestAutoInjectParam(t *testing.T) {
 		},
 	})
 
-	// 4. 执行flow1
+	// 4. Execute flow1
 	if err := flow1.Run(ctx); err != nil {
 		panic(err)
 	}

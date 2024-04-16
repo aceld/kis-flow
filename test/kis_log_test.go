@@ -2,8 +2,9 @@ package test
 
 import (
 	"context"
-	"github.com/aceld/kis-flow/log"
 	"testing"
+
+	"github.com/aceld/kis-flow/log"
 )
 
 func TestKisLogger(t *testing.T) {

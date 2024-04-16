@@ -2,22 +2,24 @@ package kis
 
 import (
 	"context"
+
 	"github.com/aceld/kis-flow/config"
 )
 
+// Connector defines the interface for connectors associated with external storage.
 type Connector interface {
-	// Init 初始化Connector所关联的存储引擎链接等
+	// Init initializes the connection to the storage engine associated with the Connector.
 	Init() error
-	// Call 调用Connector 外挂存储逻辑的读写操作
+	// Call invokes the read-write operations of the external storage logic.
 	Call(ctx context.Context, flow Flow, args interface{}) (interface{}, error)
-	// GetId 获取Connector的ID
-	GetId() string
-	// GetName 获取Connector的名称
+	// GetID returns the ID of the Connector.
+	GetID() string
+	// GetName returns the name of the Connector.
 	GetName() string
-	// GetConfig 获取Connector的配置信息
+	// GetConfig returns the configuration information of the Connector.
 	GetConfig() *config.KisConnConfig
-	// GetMetaData 得到当前Connector的临时数据
+	// GetMetaData gets the temporary data of the current Connector.
 	GetMetaData(key string) interface{}
-	// SetMetaData 设置当前Connector的临时数据
+	// SetMetaData sets the temporary data of the current Connector.
 	SetMetaData(key string, value interface{})
 }

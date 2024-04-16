@@ -1,36 +1,30 @@
 package config
 
 import (
-	"errors"
 	"fmt"
+
 	"github.com/aceld/kis-flow/common"
 )
 
-// KisConnConfig KisConnector 策略配置
+// KisConnConfig describes the KisConnector strategy configuration
 type KisConnConfig struct {
-	//配置类型
-	KisType string `yaml:"kistype"`
-	//唯一描述标识
-	CName string `yaml:"cname"`
-	//基础存储媒介地址
-	AddrString string `yaml:"addrs"`
-	//存储媒介引擎类型"Mysql" "Redis" "Kafka"等
-	Type common.KisConnType `yaml:"type"`
-	//一次存储的标识：如Redis为Key名称、Mysql为Table名称,Kafka为Topic名称等
-	Key string `yaml:"key"`
-	//配置信息中的自定义参数
-	Params map[string]string `yaml:"params"`
-	//存储读取所绑定的NsFuncionID
+	KisType    string             `yaml:"kistype"` // Configuration type
+	CName      string             `yaml:"cname"`   // Unique descriptive identifier
+	AddrString string             `yaml:"addrs"`   // Base storage medium address
+	Type       common.KisConnType `yaml:"type"`    // Storage medium engine type: "Mysql", "Redis", "Kafka", etc.
+	Key        string             `yaml:"key"`     // Identifier for a single storage: Key name for Redis, Table name for Mysql, Topic name for Kafka, etc.
+	Params     map[string]string  `yaml:"params"`  // Custom parameters in the configuration information
+
+	// NsFuncionID bound to storage reading
 	Load []string `yaml:"load"`
 	Save []string `yaml:"save"`
 }
 
-// NewConnConfig 创建一个KisConnector策略配置对象, 用于描述一个KisConnector信息
-func NewConnConfig(cName string, addr string, t common.KisConnType, key string, param FParam) *KisConnConfig {
+// NewConnConfig creates a KisConnector strategy configuration object, used to describe a KisConnector information
+func NewConnConfig(cName string, addr string, t common.KisConnType, key string, param map[string]string) *KisConnConfig {
 	strategy := new(KisConnConfig)
 	strategy.CName = cName
 	strategy.AddrString = addr
-
 	strategy.Type = t
 	strategy.Key = key
 	strategy.Params = param
@@ -38,7 +32,7 @@ func NewConnConfig(cName string, addr string, t common.KisConnType, key string, 
 	return strategy
 }
 
-// WithFunc Connector与Function进行关系绑定
+// WithFunc binds Connector to Function
 func (cConfig *KisConnConfig) WithFunc(fConfig *KisFuncConfig) error {
 
 	switch common.KisMode(fConfig.FMode) {
@@ -47,7 +41,7 @@ func (cConfig *KisConnConfig) WithFunc(fConfig *KisFuncConfig) error {
 	case common.L:
 		cConfig.Load = append(cConfig.Load, fConfig.FName)
 	default:
-		return errors.New(fmt.Sprintf("Wrong KisMode %s", fConfig.FMode))
+		return fmt.Errorf("Wrong KisMode %s", fConfig.FMode)
 	}
 
 	return nil

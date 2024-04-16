@@ -3,6 +3,7 @@ package faas
 import (
 	"context"
 	"fmt"
+
 	"github.com/aceld/kis-flow/kis"
 )
 
@@ -13,14 +14,11 @@ func FuncDemo1Handler(ctx context.Context, flow kis.Flow) error {
 	fmt.Printf("Params = %+v\n", flow.GetFuncParamAll())
 
 	for index, row := range flow.Input() {
-		// 打印数据
-		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetId(), row)
+		str := fmt.Sprintf("In FuncName = %s, FuncId = %s, row = %s", flow.GetThisFuncConf().FName, flow.GetThisFunction().GetID(), row)
 		fmt.Println(str)
 
-		// 计算结果数据
 		resultStr := fmt.Sprintf("data from funcName[%s], index = %d", flow.GetThisFuncConf().FName, index)
 
-		// 提交结果数据
 		_ = flow.CommitRow(resultStr)
 	}
 

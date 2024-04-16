@@ -2,24 +2,25 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/flow"
-	"testing"
 )
 
 func TestNewKisConnector(t *testing.T) {
 
 	ctx := context.Background()
 
-	// 1. 创建3个KisFunction配置实例, 其中myFuncConfig2 有Connector配置
+	// 1. Create three KisFunction configuration instances, with myFuncConfig2 having a Connector configuration
 	source1 := config.KisSource{
-		Name: "公众号抖音商城户订单数据",
+		Name: "TikTokOrder",
 		Must: []string{"order_id", "user_id"},
 	}
 
 	source2 := config.KisSource{
-		Name: "用户订单错误率",
+		Name: "UserOrderErrorRate",
 		Must: []string{"order_id", "user_id"},
 	}
 
@@ -42,22 +43,22 @@ func TestNewKisConnector(t *testing.T) {
 		panic("myFuncConfig3 is nil")
 	}
 
-	// 2. 创建一个KisConnector配置实例
+	// 2. Create a KisConnector configuration instance
 	myConnConfig1 := config.NewConnConfig("ConnName1", "0.0.0.0:9998", common.REDIS, "redis-key", nil)
 	if myConnConfig1 == nil {
 		panic("myConnConfig1 is nil")
 	}
 
-	// 3. 将KisConnector配置实例绑定到KisFunction配置实例上
+	// 3. Bind the KisConnector configuration instance to the KisFunction configuration instance
 	_ = myFuncConfig2.AddConnConfig(myConnConfig1)
 
-	// 4. 创建一个 KisFlow 配置实例
+	// 4. Create a KisFlow configuration instance
 	myFlowConfig1 := config.NewFlowConfig("flowName1", common.FlowEnable)
 
-	// 5. 创建一个KisFlow对象
+	// 5. Create a KisFlow object
 	flow1 := flow.NewKisFlow(myFlowConfig1)
 
-	// 6. 拼接Functioin 到 Flow 上
+	// 6. Link Functions to the Flow
 	if err := flow1.Link(myFuncConfig1, nil); err != nil {
 		panic(err)
 	}
@@ -68,12 +69,12 @@ func TestNewKisConnector(t *testing.T) {
 		panic(err)
 	}
 
-	// 7. 提交原始数据
+	// 7. Commit raw data
 	_ = flow1.CommitRow("This is Data1 from Test")
 	_ = flow1.CommitRow("This is Data2 from Test")
 	_ = flow1.CommitRow("This is Data3 from Test")
 
-	// 8. 执行flow1
+	// 8. Execute flow1
 	if err := flow1.Run(ctx); err != nil {
 		panic(err)
 	}

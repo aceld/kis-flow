@@ -1,29 +1,30 @@
 package config
 
 import (
-	"errors"
+	"fmt"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/log"
 )
 
-// FParam 在当前Flow中Function定制固定配置参数类型
+// FParam represents the type for custom fixed configuration parameters for the Function in the current Flow
 type FParam map[string]string
 
-// KisSource 表示当前Function的业务源
+// KisSource represents the business source of the current Function
 type KisSource struct {
-	Name string   `yaml:"name"` // 本层Function的数据源描述
-	Must []string `yaml:"must"` // source必传字段
+	Name string   `yaml:"name"` // Description of the data source for this layer Function
+	Must []string `yaml:"must"` // Required fields for the source
 }
 
-// KisFuncOption 可选配置
+// KisFuncOption represents optional configurations
 type KisFuncOption struct {
-	CName         string `yaml:"cname"`           // 连接器Connector名称
-	RetryTimes    int    `yaml:"retry_times"`     // 选填,Function调度重试(不包括正常调度)最大次数
-	RetryDuration int    `yaml:"return_duration"` // 选填,Function调度每次重试最大时间间隔(单位:ms)
-	Params        FParam `yaml:"default_params"`  // 选填,在当前Flow中Function定制固定配置参数
+	CName         string `yaml:"cname"`           // Connector name
+	RetryTimes    int    `yaml:"retry_times"`     // Optional, maximum retry times for Function scheduling (excluding normal scheduling)
+	RetryDuration int    `yaml:"return_duration"` // Optional, maximum time interval for each retry in Function scheduling (unit: ms)
+	Params        FParam `yaml:"default_params"`  // Optional, custom fixed configuration parameters for the Function in the current Flow
 }
 
-// KisFuncConfig 一个KisFunction策略配置
+// KisFuncConfig represents a KisFunction strategy configuration
 type KisFuncConfig struct {
 	KisType  string        `yaml:"kistype"`
 	FName    string        `yaml:"fname"`
@@ -33,7 +34,7 @@ type KisFuncConfig struct {
 	connConf *KisConnConfig
 }
 
-// NewFuncConfig 创建一个Function策略配置对象, 用于描述一个KisFunction信息
+// NewFuncConfig creates a Function strategy configuration object, used to describe a KisFunction information
 func NewFuncConfig(
 	funcName string, mode common.KisMode,
 	source *KisSource, option *KisFuncOption) *KisFuncConfig {
@@ -53,13 +54,13 @@ func NewFuncConfig(
 	config.FMode = string(mode)
 
 	/*
-		// FunctionS 和 L 需要必传KisConnector参数,原因是S和L需要通过Connector进行建立流式关系
+		// Functions S and L require the KisConnector parameters to be passed as they need to establish streaming relationships through Connector
 		if mode == common.S || mode == common.L {
 			if option == nil {
-				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				log.Logger().ErrorF("Function S/L needs option->Cid\n")
 				return nil
 			} else if option.CName == "" {
-				log.Logger().ErrorF("Funcion S/L need option->Cid\n")
+				log.Logger().ErrorF("Function S/L needs option->Cid\n")
 				return nil
 			}
 		}
@@ -72,26 +73,28 @@ func NewFuncConfig(
 	return config
 }
 
+// AddConnConfig WithConn binds Function to Connector
 func (fConf *KisFuncConfig) AddConnConfig(cConf *KisConnConfig) error {
 	if cConf == nil {
-		return errors.New("KisConnConfig is nil")
+		return fmt.Errorf("KisConnConfig is nil")
 	}
 
-	// Function需要和Connector进行关联
+	// Function needs to be associated with Connector
 	fConf.connConf = cConf
 
-	// Connector需要和Function进行关联
+	// Connector needs to be associated with Function
 	_ = cConf.WithFunc(fConf)
 
-	// 更新Function配置中的CName
+	// Update CName in Function configuration
 	fConf.Option.CName = cConf.CName
 
 	return nil
 }
 
+// GetConnConfig gets the Connector configuration
 func (fConf *KisFuncConfig) GetConnConfig() (*KisConnConfig, error) {
 	if fConf.connConf == nil {
-		return nil, errors.New("KisFuncConfig.connConf not set")
+		return nil, fmt.Errorf("KisFuncConfig.connConf not set")
 	}
 
 	return fConf.connConf, nil

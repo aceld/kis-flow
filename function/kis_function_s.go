@@ -2,6 +2,7 @@ package function
 
 import (
 	"context"
+
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/log"
 )
@@ -13,7 +14,7 @@ type KisFunctionS struct {
 func NewKisFunctionS() kis.Function {
 	f := new(KisFunctionS)
 
-	// 初始化metaData
+	// Initialize metaData
 	f.metaData = make(map[string]interface{})
 
 	return f
@@ -22,7 +23,7 @@ func NewKisFunctionS() kis.Function {
 func (f *KisFunctionS) Call(ctx context.Context, flow kis.Flow) error {
 	log.Logger().DebugF("KisFunctionS, flow = %+v\n", flow)
 
-	// 通过KisPool 路由到具体的执行计算Function中
+	// Route to the specific computing Function through KisPool
 	if err := kis.Pool().CallFunction(ctx, f.Config.FName, flow); err != nil {
 		log.Logger().ErrorFX(ctx, "Function Called Error err = %s\n", err)
 		return err

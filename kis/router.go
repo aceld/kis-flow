@@ -2,17 +2,16 @@ package kis
 
 import (
 	"context"
+
 	"github.com/aceld/kis-flow/common"
 )
-
-// FaaS 定义移植到 faas.go 中
 
 /*
 	Function Call
 */
 // funcRouter
 // key: Function Name
-// value: FaaSDesc 回调自定义业务的描述
+// value: FaaSDesc callback description for custom business
 type funcRouter map[string]*FaaSDesc
 
 // flowRouter
@@ -23,30 +22,31 @@ type flowRouter map[string]Flow
 /*
 	Connector Init
 */
-// ConnInit Connector 第三方挂载存储初始化
+// ConnInit Connector third-party storage initialization
 type ConnInit func(conn Connector) error
 
 // connInitRouter
-// key:
+// key: Connector Name
+// value: ConnInit
 type connInitRouter map[string]ConnInit
 
 /*
 	Connector Call
 */
-// CaaS Connector的存储读取业务实现
+// CaaS Connector storage read/write business implementation
 type CaaS func(context.Context, Connector, Function, Flow, interface{}) (interface{}, error)
 
-// connFuncRouter 通过FunctionName索引到CaaS回调存储业务的映射关系
+// connFuncRouter Maps CaaS callback storage business to FunctionName
 // key: Function Name
-// value: Connector的存储读取业务实现
+// value: Connector storage read/write business implementation
 type connFuncRouter map[string]CaaS
 
-// connSL 通过KisMode 将connFuncRouter分为两个子树
+// connSL Splits connFuncRouter into two subtrees based on KisMode
 // key: Function KisMode S/L
-// value: NsConnRouter
+// value: connFuncRouter
 type connSL map[common.KisMode]connFuncRouter
 
 // connTree
 // key: Connector Name
-// value: connSL 二级树
+// value: connSL second-level tree
 type connTree map[string]connSL

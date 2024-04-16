@@ -2,93 +2,100 @@ package common
 
 import "time"
 
-// 用户生成KisId的字符串前缀
+// Prefix string for generating KisId by users
 const (
-	KisIdTypeFlow      = "flow"
-	KisIdTypeConnector = "conn"
-	KisIdTypeFunction  = "func"
-	KisIdTypeGlobal    = "global"
-	KisIdJoinChar      = "-"
+	KisIDTypeFlow      = "flow"   // KisId type for Flow
+	KisIDTypeConnector = "conn"   // KisId type for Connector
+	KisIDTypeFunction  = "func"   // KisId type for Function
+	KisIDTypeGlobal    = "global" // KisId type for Global
+	KisIDJoinChar      = "-"      // Joining character for KisId
 )
 
 const (
-	// FunctionIdFirstVirtual 为首结点Function上一层虚拟的Function ID
-	FunctionIdFirstVirtual = "FunctionIdFirstVirtual"
-	// FunctionIdLastVirtual 为尾结点Function下一层虚拟的Function ID
-	FunctionIdLastVirtual = "FunctionIdLastVirtual"
+	// FunctionIDFirstVirtual is the virtual Function ID for the first node Function
+	FunctionIDFirstVirtual = "FunctionIDFirstVirtual"
+	// FunctionIDLastVirtual is the virtual Function ID for the last node Function
+	FunctionIDLastVirtual = "FunctionIDLastVirtual"
 )
 
+// KisMode represents the mode of KisFunction
 type KisMode string
 
 const (
-	// V 为校验特征的KisFunction, 主要进行数据的过滤，验证，字段梳理，幂等等前置数据处理
+	// V is for Verify, which mainly performs data filtering, validation, field sorting, idempotence, etc.
 	V KisMode = "Verify"
 
-	// S 为存储特征的KisFunction, S会通过KisConnector进行将数据进行存储. S Function 会通过KisConnector进行数据存储,具备相同Connector的Function在逻辑上可以进行并流
+	// S is for Save, S Function will store data through KisConnector. Functions with the same Connector can logically merge.
 	S KisMode = "Save"
 
-	// L 为加载特征的KisFunction，L会通过KisConnector进行数据加载，L Function 会通过KisConnector进行数据读取，具备相同Connector的Function可以从逻辑上与对应的S Function进行并流
+	// L is for Load, L Function will load data through KisConnector. Functions with the same Connector can logically merge with corresponding S Function.
 	L KisMode = "Load"
 
-	// C 为计算特征的KisFunction, 可以生成新的字段，计算新的值，进行数据的聚合，分析等
+	// C is for Calculate, which can generate new fields, calculate new values, and perform data aggregation, analysis, etc.
 	C KisMode = "Calculate"
 
-	// E 为扩展特征的KisFunction，作为流式计算的自定义特征Function，也同时是KisFlow当前流中的最后一个Function，概念类似Sink。
+	// E is for Expand, which serves as a custom feature Function for stream computing and is also the last Function in the current KisFlow, similar to Sink.
 	E KisMode = "Expand"
 )
 
-/*
-是否启动Flow
-*/
+// KisOnOff  Whether to enable the Flow
 type KisOnOff int
 
 const (
-	FlowEnable  KisOnOff = 1 // 启动
-	FlowDisable KisOnOff = 0 // 不启动
+	// FlowEnable Enabled
+	FlowEnable KisOnOff = 1
+	// FlowDisable Disabled
+	FlowDisable KisOnOff = 0
 )
 
+// KisConnType represents the type of KisConnector
 type KisConnType string
 
 const (
+	// REDIS is the type of Redis
 	REDIS KisConnType = "redis"
+	// MYSQL is the type of MySQL
 	MYSQL KisConnType = "mysql"
+	// KAFKA is the type of Kafka
 	KAFKA KisConnType = "kafka"
-	TIDB  KisConnType = "tidb"
-	ES    KisConnType = "es"
+	// TIDB is the type of TiDB
+	TIDB KisConnType = "tidb"
+	// ES is the type of Elasticsearch
+	ES KisConnType = "es"
 )
 
 // cache
 const (
-	// DeFaultFlowCacheCleanUp KisFlow中Flow对象Cache缓存默认的清理内存时间
-	DeFaultFlowCacheCleanUp = 5 // 单位 min
-	// DefaultExpiration 默认GoCahce时间 ，永久保存
+	// DeFaultFlowCacheCleanUp is the default cleanup time for Cache in KisFlow's Flow object Cache
+	DeFaultFlowCacheCleanUp = 5 // unit: min
+	// DefaultExpiration is the default time for GoCahce, permanent storage
 	DefaultExpiration time.Duration = 0
 )
 
 // metrics
 const (
-	METRICS_ROUTE string = "/metrics"
+	MetricsRoute string = "/metrics"
 
-	LABEL_FLOW_NAME     string = "flow_name"
-	LABEL_FLOW_ID       string = "flow_id"
-	LABEL_FUNCTION_NAME string = "func_name"
-	LABEL_FUNCTION_MODE string = "func_mode"
+	LabelFlowName     string = "flow_name"
+	LabelFlowID       string = "flow_id"
+	LabelFunctionName string = "func_name"
+	LabelFunctionMode string = "func_mode"
 
-	COUNTER_KISFLOW_DATA_TOTAL_NAME string = "kisflow_data_total"
-	COUNTER_KISFLOW_DATA_TOTAL_HELP string = "KisFlow全部Flow的数据总量"
+	CounterKisflowDataTotalName string = "kisflow_data_total"
+	CounterKisflowDataTotalHelp string = "Total data volume of all KisFlow Flows"
 
-	GANGE_FLOW_DATA_TOTAL_NAME string = "flow_data_total"
-	GANGE_FLOW_DATA_TOTAL_HELP string = "KisFlow各个FlowID数据流的数据数量总量"
+	GamgeFlowDataTotalName string = "flow_data_total"
+	GamgeFlowDataTotalHelp string = "Total data volume of each KisFlow FlowID data stream"
 
-	GANGE_FLOW_SCHE_CNTS_NAME string = "flow_schedule_cnts"
-	GANGE_FLOW_SCHE_CNTS_HELP string = "KisFlow各个FlowID被调度的次数"
+	GangeFlowScheCntsName string = "flow_schedule_cnts"
+	GangeFlowScheCntsHelp string = "Number of times each KisFlow FlowID is scheduled"
 
-	GANGE_FUNC_SCHE_CNTS_NAME string = "func_schedule_cnts"
-	GANGE_FUNC_SCHE_CNTS_HELP string = "KisFlow各个Function被调度的次数"
+	GangeFuncScheCntsName string = "func_schedule_cnts"
+	GangeFuncScheCntsHelp string = "Number of times each KisFlow Function is scheduled"
 
-	HISTOGRAM_FUNCTION_DURATION_NAME string = "func_run_duration"
-	HISTOGRAM_FUNCTION_DURATION_HELP string = "Function执行耗时"
+	HistogramFunctionDurationName string = "func_run_duration"
+	HistogramFunctionDurationHelp string = "Function execution time"
 
-	HISTOGRAM_FLOW_DURATION_NAME string = "flow_run_duration"
-	HISTOGRAM_FLOW_DURATION_HELP string = "Flow执行耗时"
+	HistogramFlowDurationName string = "flow_run_duration"
+	HistogramFlowDurationHelp string = "Flow execution time"
 )

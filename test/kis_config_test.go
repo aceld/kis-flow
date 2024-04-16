@@ -1,15 +1,16 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
-	"testing"
 )
 
 func TestNewFuncConfig(t *testing.T) {
 	source := config.KisSource{
-		Name: "公众号抖音商城户订单数据",
+		Name: "TikTokOrder",
 		Must: []string{"order_id", "user_id"},
 	}
 
@@ -56,7 +57,7 @@ func TestNewFlowConfig(t *testing.T) {
 func TestNewConnConfig(t *testing.T) {
 
 	source := config.KisSource{
-		Name: "公众号抖音商城户订单数据",
+		Name: "TikTokOrder",
 		Must: []string{"order_id", "user_id"},
 	}
 

@@ -3,6 +3,9 @@ package flow
 import (
 	"context"
 	"errors"
+	"sync"
+	"time"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/conn"
@@ -12,87 +15,85 @@ import (
 	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
 	"github.com/prometheus/client_golang/prometheus"
-	"sync"
-	"time"
 
-	"github.com/patrickmn/go-cache"
+	cache "github.com/patrickmn/go-cache"
 )
 
-// KisFlow 用于贯穿整条流式计算的上下文环境
+// KisFlow is used to manage the context environment of the entire streaming computation.
 type KisFlow struct {
-	// 基础信息
-	Id   string                // Flow的分布式实例ID(用于KisFlow内部区分不同实例)
-	Name string                // Flow的可读名称
-	Conf *config.KisFlowConfig // Flow配置策略
+	// Basic information
+	Id   string                // Distributed instance ID of the Flow (used internally by KisFlow to distinguish different instances)
+	Name string                // Readable name of the Flow
+	Conf *config.KisFlowConfig // Flow configuration policy
 
-	// Function列表
-	Funcs          map[string]kis.Function // 当前flow拥有的全部管理的全部Function对象, key: FunctionName
-	FlowHead       kis.Function            // 当前Flow所拥有的Function列表表头
-	FlowTail       kis.Function            // 当前Flow所拥有的Function列表表尾
-	flock          sync.RWMutex            // 管理链表插入读写的锁
-	ThisFunction   kis.Function            // Flow当前正在执行的KisFunction对象
-	ThisFunctionId string                  // 当前执行到的Function ID
-	PrevFunctionId string                  // 当前执行到的Function 上一层FunctionID
+	// List of Functions
+	Funcs          map[string]kis.Function // All managed Function objects of the current flow, key: FunctionName
+	FlowHead       kis.Function            // Head of the Function list owned by the current Flow
+	FlowTail       kis.Function            // Tail of the Function list owned by the current Flow
+	flock          sync.RWMutex            // Lock for managing linked list insertion and reading
+	ThisFunction   kis.Function            // KisFunction object currently being executed in the Flow
+	ThisFunctionId string                  // ID of the Function currently being executed
+	PrevFunctionId string                  // ID of the previous layer Function
 
-	// Function列表参数
-	funcParams map[string]config.FParam // flow在当前Function的自定义固定配置参数,Key:function的实例KisID, value:FParam
-	fplock     sync.RWMutex             // 管理funcParams的读写锁
+	// Function list parameters
+	funcParams map[string]config.FParam // Custom fixed configuration parameters of the Flow in the current Function, Key: KisID of the function instance, value: FParam
+	fplock     sync.RWMutex             // Lock for managing funcParams read and write
 
-	// 数据
-	buffer common.KisRowArr  // 用来临时存放输入字节数据的内部Buf, 一条数据为interface{}, 多条数据为[]interface{} 也就是KisBatch
-	data   common.KisDataMap // 流式计算各个层级的数据源
-	inPut  common.KisRowArr  // 当前Function的计算输入数据
-	abort  bool              // 是否中断Flow
-	action kis.Action        // 当前Flow所携带的Action动作
+	// Data
+	buffer common.KisRowArr  // Internal buffer used to temporarily store input byte data, one data is interface{}, multiple data is []interface{} i.e. KisBatch
+	data   common.KisDataMap // Data sources at various levels of the streaming computation
+	inPut  common.KisRowArr  // Input data for the current Function computation
+	abort  bool              // Whether to abort the Flow
+	action kis.Action        // Action carried by the current Flow
 
-	// flow的本地缓存
-	cache *cache.Cache // Flow流的临时缓存上线文环境
+	// Local cache of the flow
+	cache *cache.Cache // Temporary cache context environment of the Flow
 
-	// flow的metaData
-	metaData map[string]interface{} // Flow的自定义临时数据
-	mLock    sync.RWMutex           // 管理metaData的读写锁
+	// metaData of the flow
+	metaData map[string]interface{} // Custom temporary data of the Flow
+	mLock    sync.RWMutex           // Lock for managing metaData read and write
 }
 
-// NewKisFlow 创建一个KisFlow.
+// NewKisFlow creates a KisFlow.
 func NewKisFlow(conf *config.KisFlowConfig) kis.Flow {
 	flow := new(KisFlow)
-	// 实例Id
-	flow.Id = id.KisID(common.KisIdTypeFlow)
+	// Instance Id
+	flow.Id = id.KisID(common.KisIDTypeFlow)
 
-	// 基础信息
+	// Basic information
 	flow.Name = conf.FlowName
 	flow.Conf = conf
 
-	// Function列表
+	// List of Functions
 	flow.Funcs = make(map[string]kis.Function)
 	flow.funcParams = make(map[string]config.FParam)
 
-	// 数据data
+	// Data
 	flow.data = make(common.KisDataMap)
 
-	// 初始化本地缓存
+	// Initialize local cache
 	flow.cache = cache.New(cache.NoExpiration, common.DeFaultFlowCacheCleanUp*time.Minute)
 
-	// 初始化临时数据
+	// Initialize temporary data
 	flow.metaData = make(map[string]interface{})
 
 	return flow
 }
 
-// Fork 得到Flow的一个副本(深拷贝)
+// Fork gets a copy (deep copy) of the Flow.
 func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 
 	cfg := flow.Conf
 
-	// 通过之前的配置生成一个新的Flow
+	// Generate a new Flow based on the previous configuration
 	newFlow := NewKisFlow(cfg)
 
 	for _, fp := range flow.Conf.Flows {
-		if _, ok := flow.funcParams[flow.Funcs[fp.FuncName].GetId()]; !ok {
-			// 当前function没有配置Params
+		if _, ok := flow.funcParams[flow.Funcs[fp.FuncName].GetID()]; !ok {
+			// The current function has no Params configured
 			_ = newFlow.AppendNewFunction(flow.Funcs[fp.FuncName].GetConfig(), nil)
 		} else {
-			// 当前function有配置Params
+			// The current function has configured Params
 			_ = newFlow.AppendNewFunction(flow.Funcs[fp.FuncName].GetConfig(), fp.Params)
 		}
 	}
@@ -103,15 +104,15 @@ func (flow *KisFlow) Fork(ctx context.Context) kis.Flow {
 	return newFlow
 }
 
-// Link 将Function链接到Flow中, 同时会将Function的配置参数添加到Flow的配置中
-// fConf: 当前Function策略
-// fParams: 当前Flow携带的Function动态参数
+// Link links the Function to the Flow, and also adds the Function's configuration parameters to the Flow's configuration.
+// fConf: Current Function strategy
+// fParams: Dynamic parameters carried by the current Flow's Function
 func (flow *KisFlow) Link(fConf *config.KisFuncConfig, fParams config.FParam) error {
 
-	// Flow 添加Function
+	// Add Function to Flow
 	_ = flow.AppendNewFunction(fConf, fParams)
 
-	// FlowConfig 添加Function
+	// Add Function to FlowConfig
 	flowFuncParam := config.KisFlowFunctionParam{
 		FuncName: fConf.FName,
 		Params:   fParams,
@@ -121,33 +122,33 @@ func (flow *KisFlow) Link(fConf *config.KisFuncConfig, fParams config.FParam) er
 	return nil
 }
 
-// AppendNewFunction 将一个新的Function追加到到Flow中
+// AppendNewFunction appends a new Function to the Flow.
 func (flow *KisFlow) AppendNewFunction(fConf *config.KisFuncConfig, fParams config.FParam) error {
-	// 创建Function实例
+	// Create Function instance
 	f := function.NewKisFunction(flow, fConf)
 
 	if fConf.Option.CName != "" {
-		// 当前Function有Connector关联，需要初始化Connector实例
+		// The current Function has a Connector association and needs to initialize the Connector instance
 
-		// 获取Connector配置
+		// Get Connector configuration
 		connConfig, err := fConf.GetConnConfig()
 		if err != nil {
 			panic(err)
 		}
 
-		// 创建Connector对象
+		// Create Connector object
 		connector := conn.NewKisConnector(connConfig)
 
-		// 初始化Connector, 执行Connector Init 方法
+		// Initialize Connector, execute the Connector Init method
 		if err = connector.Init(); err != nil {
 			panic(err)
 		}
 
-		// 关联Function实例和Connector实例关系
+		// Associate the Function instance with the Connector instance
 		_ = f.AddConnector(connector)
 	}
 
-	// Flow 添加 Function
+	// Add Function to Flow
 	if err := flow.appendFunc(f, fParams); err != nil {
 		return err
 	}
@@ -155,7 +156,7 @@ func (flow *KisFlow) AppendNewFunction(fConf *config.KisFuncConfig, fParams conf
 	return nil
 }
 
-// appendFunc 将Function添加到Flow中, 链表操作
+// appendFunc adds the Function to the Flow, linked list operation
 func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) error {
 
 	if function == nil {
@@ -166,7 +167,7 @@ func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) err
 	defer flow.flock.Unlock()
 
 	if flow.FlowHead == nil {
-		// 首次添加节点
+		// First time adding a node
 		flow.FlowHead = function
 		flow.FlowTail = function
 
@@ -174,7 +175,7 @@ func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) err
 		function.SetP(nil)
 
 	} else {
-		// 将function插入到链表的尾部
+		// Insert the function at the end of the linked list
 		function.SetP(flow.FlowTail)
 		function.SetN(nil)
 
@@ -182,28 +183,28 @@ func (flow *KisFlow) appendFunc(function kis.Function, fParam config.FParam) err
 		flow.FlowTail = function
 	}
 
-	// 将Function Name 详细Hash对应关系添加到flow对象中
+	// Add the detailed Function Name-Hash correspondence to the flow object
 	flow.Funcs[function.GetConfig().FName] = function
 
-	// 先添加function 默认携带的Params参数
+	// First add the Params parameters carried by the function by default
 	params := make(config.FParam)
 	for key, value := range function.GetConfig().Option.Params {
 		params[key] = value
 	}
 
-	// 再添加flow携带的function定义参数(重复即覆盖)
+	// Then add the function definition parameters carried by the flow (overwriting duplicates)
 	for key, value := range fParam {
 		params[key] = value
 	}
 
-	// 将得到的FParams存留在flow结构体中，用来function业务直接通过Hash获取
-	// key 为当前Function的KisId，不用Fid的原因是为了防止一个Flow添加两个相同策略Id的Function
-	flow.funcParams[function.GetId()] = params
+	// Store the obtained FParams in the flow structure for direct access by the function
+	// The key is the KisId of the current Function, not using Fid to prevent adding two Functions with the same strategy Id to a Flow
+	flow.funcParams[function.GetID()] = params
 
 	return nil
 }
 
-// Run 启动KisFlow的流式计算, 从起始Function开始执行流
+// Run starts the streaming computation of KisFlow, starting from the initial Function.
 func (flow *KisFlow) Run(ctx context.Context) error {
 
 	var fn kis.Function
@@ -212,7 +213,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 	flow.abort = false
 
 	if flow.Conf.Status == int(common.FlowDisable) {
-		// flow被配置关闭
+		// Flow is configured to be disabled
 		return nil
 	}
 
@@ -220,27 +221,27 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 	var funcStart time.Time
 	var flowStart time.Time
 
-	// 因为此时还没有执行任何Function, 所以PrevFunctionId为FirstVirtual 因为没有上一层Function
-	flow.PrevFunctionId = common.FunctionIdFirstVirtual
+	// Since no Function has been executed at this time, PrevFunctionId is FirstVirtual because there is no previous layer Function
+	flow.PrevFunctionId = common.FunctionIDFirstVirtual
 
-	// 提交数据流原始数据
+	// Commit the original data stream
 	if err := flow.commitSrcData(ctx); err != nil {
 		return err
 	}
 
 	// Metrics
 	if config.GlobalConfig.EnableProm == true {
-		// 统计Flow的调度次数
+		// Count the number of Flow schedules
 		metrics.Metrics.FlowScheduleCntsToTal.WithLabelValues(flow.Name).Inc()
-		// 统计Flow的执行消耗时长
+		// Count the execution time of Flow
 		flowStart = time.Now()
 	}
 
-	// 流式链式调用
+	// Streaming chain call
 	for fn != nil && flow.abort == false {
 
-		// flow记录当前执行到的Function 标记
-		fid := fn.GetId()
+		// Record the current Function being executed by the flow
+		fid := fn.GetID()
 		flow.ThisFunction = fn
 		flow.ThisFunctionId = fid
 
@@ -248,14 +249,14 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 		fMode := fn.GetConfig().FMode
 
 		if config.GlobalConfig.EnableProm == true {
-			// 统计Function调度次数
+			// Count the number of Function schedules
 			metrics.Metrics.FuncScheduleCntsTotal.WithLabelValues(fName, fMode).Inc()
 
-			// 统计Function 耗时 记录开始时间
+			// Count the time consumed by Function, record the start time
 			funcStart = time.Now()
 		}
 
-		// 得到当前Function要处理与的源数据
+		// Get the source data that the current Function needs to process
 		if inputData, err := flow.getCurData(); err != nil {
 			log.Logger().ErrorFX(ctx, "flow.Run(): getCurData err = %s\n", err.Error())
 			return err
@@ -273,16 +274,16 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 				return err
 			}
 
-			// 统计Function 耗时
+			// Count the time consumed by Function
 			if config.GlobalConfig.EnableProm == true {
-				// Function消耗时间
+				// Function consumption time
 				duration := time.Since(funcStart)
 
-				// 统计当前Function统计指标,做时间统计
+				// Count the current Function metrics, do time statistics
 				metrics.Metrics.FunctionDuration.With(
 					prometheus.Labels{
-						common.LABEL_FUNCTION_NAME: fName,
-						common.LABEL_FUNCTION_MODE: fMode}).Observe(duration.Seconds() * 1000)
+						common.LabelFunctionName: fName,
+						common.LabelFunctionMode: fMode}).Observe(duration.Seconds() * 1000)
 			}
 
 		}
@@ -290,7 +291,7 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 
 	// Metrics
 	if config.GlobalConfig.EnableProm == true {
-		// 统计Flow执行耗时
+		// Count the execution time of Flow
 		duration := time.Since(flowStart)
 		metrics.Metrics.FlowDuration.WithLabelValues(flow.Name).Observe(duration.Seconds() * 1000)
 	}
@@ -298,10 +299,10 @@ func (flow *KisFlow) Run(ctx context.Context) error {
 	return nil
 }
 
-// Next 当前Flow执行到的Function进入下一层Function所携带的Action动作
+// Next the current Flow enters the Action action carried by the next layer Function.
 func (flow *KisFlow) Next(acts ...kis.ActionFunc) error {
 
-	// 加载Function FaaS 传递的 Action动作
+	// Load the Action actions carried by Function FaaS
 	flow.action = kis.LoadActions(acts)
 
 	return nil
@@ -311,7 +312,7 @@ func (flow *KisFlow) GetName() string {
 	return flow.Name
 }
 
-func (flow *KisFlow) GetId() string {
+func (flow *KisFlow) GetID() string {
 	return flow.Id
 }
 
@@ -323,7 +324,7 @@ func (flow *KisFlow) GetThisFuncConf() *config.KisFuncConfig {
 	return flow.ThisFunction.GetConfig()
 }
 
-// GetConnector 得到当前正在执行的Function的Connector
+// GetConnector gets the Connector of the Function currently being executed by the Flow.
 func (flow *KisFlow) GetConnector() (kis.Connector, error) {
 	if connector := flow.ThisFunction.GetConnector(); connector != nil {
 		return connector, nil
@@ -332,7 +333,7 @@ func (flow *KisFlow) GetConnector() (kis.Connector, error) {
 	}
 }
 
-// GetConnConf 得到当前正在执行的Function的Connector的配置
+// GetConnConf gets the Connector configuration of the Function currently being executed by the Flow.
 func (flow *KisFlow) GetConnConf() (*config.KisConnConfig, error) {
 	if connector := flow.ThisFunction.GetConnector(); connector != nil {
 		return connector.GetConfig(), nil
@@ -345,7 +346,7 @@ func (flow *KisFlow) GetConfig() *config.KisFlowConfig {
 	return flow.Conf
 }
 
-// GetFuncConfigByName 得到当前Flow的配置
+// GetFuncConfigByName gets the configuration of the current Flow by Function name.
 func (flow *KisFlow) GetFuncConfigByName(funcName string) *config.KisFuncConfig {
 	if f, ok := flow.Funcs[funcName]; ok {
 		return f.GetConfig()

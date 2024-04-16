@@ -3,23 +3,24 @@ package test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/flow"
 	"github.com/aceld/kis-flow/kis"
-	"testing"
 )
 
 func TestForkFlow(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. 加载配置文件并构建Flow
+	// 1. Load configuration file and build Flow
 	if err := file.ConfigImportYaml("load_conf/"); err != nil {
 		panic(err)
 	}
 
-	// 2. 获取Flow
+	// 2. Get Flow
 	flow1 := kis.Pool().GetFlow("flowFork1")
 
 	fmt.Println("----> flow1: ", flow1.GetFuncParamsAllFuncs())
@@ -27,10 +28,10 @@ func TestForkFlow(t *testing.T) {
 	flow1Clone1 := flow1.Fork(ctx)
 	fmt.Println("----> flow1Clone1: ", flow1Clone1.GetFuncParamsAllFuncs())
 
-	// 3. 提交原始数据
+	// 3. Commit raw data
 	_ = flow1Clone1.CommitRow("This is Data1 from Test")
 
-	// 4. 执行flow1
+	// 4. Execute flow1
 	if err := flow1Clone1.Run(ctx); err != nil {
 		panic(err)
 	}
@@ -58,10 +59,10 @@ func TestForkFlowWithLink(t *testing.T) {
 
 	fmt.Println("----> flow1Clone1: ", flow1Clone1.GetFuncParamsAllFuncs())
 
-	// 3. 提交原始数据
+	// 3. Commit raw data
 	_ = flow1Clone1.CommitRow("This is Data1 from Test")
 
-	// 4. 执行flow1
+	// 4. Execute flow1
 	if err := flow1Clone1.Run(ctx); err != nil {
 		panic(err)
 	}
