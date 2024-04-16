@@ -96,8 +96,6 @@ func NewFaaSDesc(fnName string, f FaaS) (*FaaSDesc, error) {
 				// If the current parameter does not implement the Serialize interface, use the default serialization implementation
 				serializeImpl = defaultSerialize // Use global default implementation
 			}
-		} else {
-			// Other types are not supported
 		}
 
 		// Append the current parameter type to the argsType collection

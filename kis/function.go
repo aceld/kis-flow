@@ -6,8 +6,7 @@ import (
 	"github.com/aceld/kis-flow/config"
 )
 
-// Function is the basic computation unit of streaming computation. KisFunction is a basic logical unit of streaming computation,
-//               any number of KisFunctions can be combined into a KisFlow
+// Function is the basic computation unit of streaming computation. KisFunction is a basic logical unit of streaming computation, any number of KisFunctions can be combined into a KisFlow
 type Function interface {
 	// Call executes the streaming computation logic
 	Call(ctx context.Context, flow Flow) error

@@ -7,7 +7,7 @@ import (
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/kis"
 
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // ConfigExportYaml exports the flow configuration and saves it locally
