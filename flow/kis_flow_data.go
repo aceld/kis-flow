@@ -11,7 +11,6 @@ import (
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
-	"github.com/patrickmn/go-cache"
 )
 
 // CommitRow submits a single row of data to the Flow; multiple rows can be submitted multiple times
@@ -174,7 +173,7 @@ func (flow *KisFlow) GetCacheData(key string) interface{} {
 
 func (flow *KisFlow) SetCacheData(key string, value interface{}, Exp time.Duration) {
 	if Exp == common.DefaultExpiration {
-		flow.cache.Set(key, value, cache.DefaultExpiration)
+		flow.cache.Set(key, value, 0)
 	} else {
 		flow.cache.Set(key, value, Exp)
 	}

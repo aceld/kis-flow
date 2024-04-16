@@ -12,8 +12,9 @@ package serialize
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aceld/kis-flow/common"
 	"reflect"
+
+	"github.com/aceld/kis-flow/common"
 )
 
 type DefaultSerialize struct{}
