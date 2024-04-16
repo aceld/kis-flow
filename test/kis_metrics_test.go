@@ -3,10 +3,11 @@ package test
 import (
 	"context"
 	"fmt"
-	"github.com/aceld/kis-flow/file"
-	"github.com/aceld/kis-flow/kis"
 	"testing"
 	"time"
+
+	"github.com/aceld/kis-flow/file"
+	"github.com/aceld/kis-flow/kis"
 )
 
 func TestMetricsDataTotal(t *testing.T) {

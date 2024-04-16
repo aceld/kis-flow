@@ -2,9 +2,10 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/kis"
-	"testing"
 )
 
 func TestConfigImportYaml(t *testing.T) {

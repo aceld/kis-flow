@@ -3,9 +3,10 @@ package test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/kis"
-	"testing"
 )
 
 func TestActionAbort(t *testing.T) {

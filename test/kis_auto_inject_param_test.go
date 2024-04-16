@@ -2,6 +2,8 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/file"
@@ -9,7 +11,6 @@ import (
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/test/faas"
 	"github.com/aceld/kis-flow/test/proto"
-	"testing"
 )
 
 func TestAutoInjectParamWithConfig(t *testing.T) {

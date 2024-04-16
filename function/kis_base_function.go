@@ -3,11 +3,12 @@ package function
 import (
 	"context"
 	"errors"
+	"sync"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/id"
 	"github.com/aceld/kis-flow/kis"
-	"sync"
 )
 
 type BaseFunction struct {

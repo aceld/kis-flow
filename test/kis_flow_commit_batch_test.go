@@ -2,10 +2,11 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/log"
-	"testing"
 )
 
 func TestForkFlowCommitBatch(t *testing.T) {

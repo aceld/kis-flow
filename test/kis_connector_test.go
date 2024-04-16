@@ -2,10 +2,11 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/flow"
-	"testing"
 )
 
 func TestNewKisConnector(t *testing.T) {

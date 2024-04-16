@@ -1,9 +1,10 @@
 package id
 
 import (
+	"strings"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/google/uuid"
-	"strings"
 )
 
 // KisID generates a random instance ID.

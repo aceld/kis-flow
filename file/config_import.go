@@ -2,15 +2,16 @@ package file
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/flow"
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/metrics"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 type allConfig struct {

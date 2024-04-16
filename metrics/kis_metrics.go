@@ -1,12 +1,13 @@
 package metrics
 
 import (
+	"net/http"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 // KisMetrics kisFlow's Prometheus monitoring metrics

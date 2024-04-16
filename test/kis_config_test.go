@@ -1,10 +1,11 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/log"
-	"testing"
 )
 
 func TestNewFuncConfig(t *testing.T) {

@@ -2,6 +2,7 @@ package faas
 
 import (
 	"context"
+
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/serialize"
 	"github.com/aceld/kis-flow/test/proto"

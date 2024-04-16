@@ -3,12 +3,13 @@ package test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/file"
 	"github.com/aceld/kis-flow/flow"
 	"github.com/aceld/kis-flow/kis"
-	"testing"
 )
 
 func TestForkFlow(t *testing.T) {

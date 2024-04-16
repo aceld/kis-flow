@@ -3,6 +3,9 @@ package flow
 import (
 	"context"
 	"errors"
+	"sync"
+	"time"
+
 	"github.com/aceld/kis-flow/common"
 	"github.com/aceld/kis-flow/config"
 	"github.com/aceld/kis-flow/conn"
@@ -12,8 +15,6 @@ import (
 	"github.com/aceld/kis-flow/log"
 	"github.com/aceld/kis-flow/metrics"
 	"github.com/prometheus/client_golang/prometheus"
-	"sync"
-	"time"
 
 	"github.com/patrickmn/go-cache"
 )
