@@ -1,18 +1,19 @@
 # <img width="250px" src="https://github.com/aceld/kis-flow/assets/7778936/8729d750-897c-4ba3-98b4-c346188d034e" />
-English | [简体中文](README-CN.md)
-
+[English](README.md) | 简体中文
 
 [![License](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Discord](https://img.shields.io/badge/KisFlow-Discord-blue.svg)](https://discord.gg/xQ8Xxfyfcz)
-[![KisFlow-tutorial](https://img.shields.io/badge/KisFlowTutorial-YuQue-red.svg)](https://www.yuque.com/aceld/kis-flow)
+[![KisFlow-tutorial](https://img.shields.io/badge/KisFlowTutorial-YuQue-red.svg)](https://www.yuque.com/aceld/kis-flow) 
 [![KisFlow-Doc](https://img.shields.io/badge/KisFlow-Doc-green.svg)](https://www.yuque.com/aceld/kis-flow-doc)
 
 
 #### KisFlow(Keep It Simple Flowing)
 
-A Streaming Computation Framework Based on Golang. Emphasizes maintaining a simple, clear, and smooth process while performing various activities or tasks.
+基于Golang的流式计算框架. 为保持简单的流动，强调在进行各种活动或工作时保持简洁、清晰、流畅的过程。
 
-## Source code for KisFlow
+
+
+## KisFlow源代码
 
 Github
 Git: https://github.com/aceld/kis-flow
@@ -20,71 +21,69 @@ Git: https://github.com/aceld/kis-flow
 Gitee(China)
 Git: https://gitee.com/Aceld/kis-flow
 
-## KisFlow Developer Documentation
+## 《KisFlow开发者文档》
 
 https://www.yuque.com/aceld/kis-flow-doc
 
-## Tutorial for KisFlow Framework Development 
+## KisFlow框架开发教程
 
- 《Practical Tutorial for a Streaming Computation Framework Based on Golang》
+*《基于Golang的流式计算框架实战教程》*
 
 <img width="350px" src="https://github.com/aceld/kis-flow/assets/7778936/173e3f5a-eac1-4b32-aa09-ef65053a5ef2" />
 
 https://www.yuque.com/aceld/hsa94o
 
-## Positioning of the KisFlow System
+## KisFlow系统定位
 
-KisFlow serves as the upstream computing layer for business, connecting to the ODS layer of data warehouses or other business methods upstream, and connecting to the data center of this business's storage downstream. <br />
-
+KisFlow为业务上游计算层，上层接数仓/其他业务方ODS层、下游接本业务存储数据中心。<br />
 
 <img width="700px" src="https://github.com/aceld/kis-flow/assets/7778936/b9e1957a-2d11-45d9-84c1-e92c9ac833cc" />
 
 
-## KisFlow Overall Architecture Diagram
+## KisFlow整体架构图
 
-
-| Levels    | Level Explanation                                                                               | Sub-modules                                                                                                                                                                                                                                                                                                           |
+| 层级    | 层级说明                                                                               | 包括子模块                                                                                                                                                                                                                                                                                                           |
 |-------|------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Flowing Computation Layer | The upstream computing layer for KisFlow, which directly connects to business storage and the ODS (Operational Data Store) layer of data warehouses. The upstream can be MySQL Binlog, logs, interface data, etc., and it supports a passive consumption mode, providing KisFlow with real-time computing capabilities. | **KisFlow**: Distributed batch consumer; a KisFlow is composed of multiple KisFunctions. <br /><br />**KisConnectors**: Computing data stream intermediate state persistence and connectors. <br /><br />**KisFunctions**: Supports operator expression splicing, connector integration, strategy configuration, Stateful Function mode, and Slink stream splicing. <br /><br />**KisConfig**: Binding of flow processing policies for KisFunctions, allowing Functions to have fixed independent processing capabilities. <br /><br />**KisSource**: Interface for connecting to ODS data sources. |
-| Task Scheduling Layer | Timed task scheduling and execution business logic, including task scheduling platform, executor management, scheduling logs, and user management. Provides KisFlow's timed task, statistics, and aggregation calculation capabilities.  | **The task scheduling platform has a visual interface.**：ncludes running reports, scheduling reports, success rate, task management, configuration management, and GLUE IDE as visual management platforms. <br /><br /> **Executor management KisJobs**: Golang SDK, custom business logic, executor automatic registration, task triggering, termination, and removal.<br /><br /> **Executor scenarios KisScenes**: Logical task sets divided according to business needs.<br /><br /> **Scheduling logs and user management**: Collection of task scheduling logs, detailed scheduling, and scheduling process traces.                                                                              |
-
+| 流式计算层 | 为KisFlow上游计算层，直接对接业务存储及数仓ODS层，如上游可以为Mysql Binlog、日志、接口数据等，为被动消费模式，提供KisFlow实时计算能力。 | **KisFlow**：分布式批量消费者,一个KisFlow是由多个KisFunction组合。<br /><br />**KisConnectors**：计算数据流流中间状态持久存储及连接器。<br /><br />**KisFunctions**：支持算子表达式拼接，Connectors集成、策略配置、Stateful Function模式、Slink流式拼接等。<br /><br />**KisConfig：** KisFunction的绑定的流处理策略，可以绑定ReSource让Function具有固定的独立流处理能力。<br /><br />**KisSource：** 对接ODS的数据源 |
+| 任务调度层 | 定时任务调度及执行器业务逻辑，包括任务调度平台、执行器管理、调度日志及用户管理等。提供KisFlow的定时任务、统计、聚合运算等调度计算能力。            | **任务调度平台可视化**：包括任务的运行报表、调度报表、成功比例、任务管理、配置管理、GLUE IDE等可视化管理平台。<br /><br />执行器管理**KisJobs**：Golang SDK及计算自定义业务逻辑、执行器的自动注册、任务触发、终止及摘除等。<br /><br />**执行器场景KisScenes：** 根据业务划分的逻辑任务集合。<br /><br />**调度日志及用户管理**：任务调度日志收集、调度详细、调度流程痕迹等。                                                                              |
 
 ![KisFlow架构图drawio](https://github.com/aceld/kis-flow/assets/7778936/3b829bdb-600d-4ab9-9e62-e14f90737cc3)
 
 ![KisFlow架构设计-KisFlow整体结构 drawio](https://github.com/aceld/kis-flow/assets/7778936/efc1b29d-9dd4-4945-a35a-fb9a618002d7)
 
-KisFlow is a flow-based conceptual form, and its specific characteristics are as follows: <br />
+KisFlow是一种流式概念形态，具体表现的特征如下：<br />
 
-1. A KisFlow can be composed of any KisFunction(s), and the length of a KisFlow can be dynamically adjusted. <br />
+1、一个KisFlow可以由任意KisFunction组成，且KisFlow可以动态的调整长度。<br />
 
-2. A KisFunction can be dynamically added to a specific KisFlow at any time, and the relationship between KisFlows can be dynamically adjusted through the addition of KisFunction's Load and Save nodes for parallel and branching actions.<br />
+2、一个KisFunction可以随时动态的加入到某个KisFlow中，且KisFlow和KisFlow之间的关系可以通过KisFunction的Load和Save节点的加入，进行动态的并流和分流动作。<br />
 
-3. In programming behavior, KisFlow has shifted from data business programming to function-based single computing logic development, approaching the FaaS (Function as a Service) system.
+3、KisFlow在编程行为上，从面向流进行数据业务编程，变成了面向KisFunction的函数单计算逻辑的开发，接近FaaS(Function as a
+service)体系。
 
 ## Example
 
-Below is a simple application scenario case, please refer to the specific application unit cases.
+下面是简单的应用场景案例，具体应用单元用例请 参考
 
 https://github.com/aceld/kis-flow-usage
 
-#### [KisFlow Developer Documentation](https://github.com/aceld/kis-flow/wiki)
+#### 《KisFlow开发者文档》
 
+https://www.yuque.com/aceld/kis-flow-doc
 
-
-#### Install KisFlow
+#### 安装KisFlow
 
 ```bash
 $go get github.com/aceld/kis-flow
 ```
 
 <details>
-<summary>1. Quick Start </summary>
+<summary>1. Quick Start（快速开始）</summary>
 
-### Source Code
+### 案例源代码
 
 https://github.com/aceld/kis-flow-usage/tree/main/1-quick_start
 
-### Project Directory
+### 项目目录
 
 ```bash
 ├── faas_stu_score_avg.go
@@ -242,13 +241,13 @@ stuid: [102], avg score: [76.66666666666667]
 
 
 <details>
-<summary>2. Quick Start With Config </summary>
+<summary>2. Quick Start With Config（快速开始）</summary>
 
-### Source Code
+### 案例源代码
 
 https://github.com/aceld/kis-flow-usage/tree/main/2-quick_start_with_config
 
-### Project Directory
+项目目录
 
 ```bash
 ├── Makefile
@@ -289,7 +288,7 @@ kistype: func
 fname: AvgStuScore
 fmode: Calculate
 source:
-  name: StudentScore
+  name: 学生学分
   must:
     - stu_id
 ```
@@ -303,7 +302,7 @@ kistype: func
 fname: PrintStuAvgScore
 fmode: Expand
 source:
-  name: StudentScore
+  name: 学生学分
   must:
     - stu_id
 ```
@@ -383,7 +382,7 @@ type AvgStuScoreOut struct {
 	AvgScore float64 `json:"avg_score"`
 }
 
-// AvgStuScore(FaaS) 计
+// AvgStuScore(FaaS) 计算学生平均分
 func AvgStuScore(ctx context.Context, flow kis.Flow, rows []*AvgStuScoreIn) error {
 	for _, row := range rows {
 
@@ -392,7 +391,7 @@ func AvgStuScore(ctx context.Context, flow kis.Flow, rows []*AvgStuScoreIn) erro
 			AvgScore: float64(row.Score1+row.Score2+row.Score3) / 3,
 		}
 
-		// Commit Result Data
+		// 提交结果数据
 		_ = flow.CommitRow(out)
 	}
 
@@ -449,7 +448,7 @@ stuid: [102], avg score: [76.66666666666667]
 
 ---
 
-### KisFlow Contributors
+### 开发者
 
 * 刘丹冰([@aceld](https://github.com/aceld))
 * 胡辰豪([@ChenHaoHu](https://github.com/ChenHaoHu))
@@ -460,12 +459,12 @@ Thanks to all the developers who contributed to KisFlow!
   <img src="https://contrib.rocks/image?repo=aceld/kis-flow" />
 </a>    
 
-### Join the KisFlow Community
+### 加入KisFlow 社区
 
-| platform                                                                                                                                                             | Entry                                                                                                                                                                                                                                      | 
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| 
-| <img src="https://user-images.githubusercontent.com/7778936/236775008-6bd488e3-249a-4d43-8885-7e3889e11e2d.png" width = "100" height = "100" alt="" align=center />  | https://discord.gg/xQ8Xxfyfcz                                                                                                                                                                                                              | 
-| <img src="https://user-images.githubusercontent.com/7778936/236775137-5381f8a6-f534-49c4-8628-e52bf245c3bc.jpeg" width = "100" height = "100" alt="" align=center /> | Add WeChat: ace_ld or scan the QR code, and note flow to proceed. </br><img src="https://user-images.githubusercontent.com/7778936/236781258-2f0371bd-5797-49e8-a74c-680e9f15843d.png" width = "150" height = "150" alt="" align=center /> |
-| <img src="https://user-images.githubusercontent.com/7778936/236778547-9cdadfb6-0f62-48ac-851a-b940389038d0.jpeg" width = "100" height = "100" alt="" align=center /> | <img src="https://s1.ax1x.com/2020/07/07/UFyUdx.th.jpg" height = "150"  alt="" align=center /> **WeChat Public Account**                                                                                                                   |
-| <img src="https://user-images.githubusercontent.com/7778936/236779000-70f16c8f-0eec-4b5f-9faa-e1d5229a43e0.png" width = "100" height = "100" alt="" align=center />  | <img src="https://github.com/aceld/zinx/assets/7778936/461b409f-6337-48a8-826b-a7a746aaee31" width = "150" height = "150" alt="" align=center /> **QQ Group**                                                                              |
+| platform                                                                                                                                                             | Entry                                                                                                                                                                                                    | 
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| <img src="https://user-images.githubusercontent.com/7778936/236775008-6bd488e3-249a-4d43-8885-7e3889e11e2d.png" width = "100" height = "100" alt="" align=center />  | https://discord.gg/xQ8Xxfyfcz                                                                                                                                                                            | 
+| <img src="https://user-images.githubusercontent.com/7778936/236775137-5381f8a6-f534-49c4-8628-e52bf245c3bc.jpeg" width = "100" height = "100" alt="" align=center /> | 加微信: `ace_ld`  或扫二维码，备注`flow`即可。</br><img src="https://user-images.githubusercontent.com/7778936/236781258-2f0371bd-5797-49e8-a74c-680e9f15843d.png" width = "150" height = "150" alt="" align=center /> |
+| <img src="https://user-images.githubusercontent.com/7778936/236778547-9cdadfb6-0f62-48ac-851a-b940389038d0.jpeg" width = "100" height = "100" alt="" align=center /> | <img src="https://s1.ax1x.com/2020/07/07/UFyUdx.th.jpg" height = "150"  alt="" align=center /> **WeChat Public Account**                                                                                 |
+| <img src="https://user-images.githubusercontent.com/7778936/236779000-70f16c8f-0eec-4b5f-9faa-e1d5229a43e0.png" width = "100" height = "100" alt="" align=center />  | <img src="https://github.com/aceld/zinx/assets/7778936/461b409f-6337-48a8-826b-a7a746aaee31" width = "150" height = "150" alt="" align=center /> **QQ Group**                                                                                 |
 
