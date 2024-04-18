@@ -34,7 +34,7 @@ Git: https://gitee.com/Aceld/kis-flow
 
 | platform | Entry                                                                                                                                              | 
 | ---- |----------------------------------------------------------------------------------------------------------------------------------------------------| 
-| <img src="https://user-images.githubusercontent.com/7778936/236784004-b6d99e26-b1ab-4bc3-988e-7a46108b85fe.png" width = "100" height = "100" alt="" align=center />| [Practical Tutorial for a Streaming Computation Framework Based on Golang](https://dev.to/aceld/1building-basic-services-with-zinx-framework-296e) | 
+| <img src="https://user-images.githubusercontent.com/7778936/236784004-b6d99e26-b1ab-4bc3-988e-7a46108b85fe.png" width = "100" height = "100" alt="" align=center />| [Practical Tutorial for a Streaming Computation Framework Based on Golang](https://dev.to/aceld/part-1-golang-framework-hands-on-kisflow-streaming-computing-framework-overview-8fh) | 
 |<img src="https://user-images.githubusercontent.com/7778936/236784168-6528a9b8-d37b-4b02-a37c-b9988d7508d8.jpeg" width = "100" height = "100" alt="" align=center />| [《基于Golang的流式计算框架实战教程》](https://www.yuque.com/aceld/hsa94o)                                                                                              |
 
 
