@@ -11,7 +11,7 @@ import (
 	"github.com/aceld/kis-flow/flow"
 	"github.com/aceld/kis-flow/kis"
 	"github.com/aceld/kis-flow/metrics"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type allConfig struct {
