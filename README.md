@@ -17,7 +17,10 @@ A Streaming Computation Framework Based on Golang. Emphasizes maintaining a simp
 Github
 Git: https://github.com/aceld/kis-flow
 
-Gitee(China)
+GitCode
+Git: https://gitcode.com/aceld/kis-flow
+
+Gitee
 Git: https://gitee.com/Aceld/kis-flow
 
 ## Documentation
